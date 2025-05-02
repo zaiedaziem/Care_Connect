@@ -25,6 +25,7 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
   //muzaking
   //tryuasuconasciu
+  //tegar
   final String title;
 
   @override
