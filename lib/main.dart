@@ -28,6 +28,11 @@ class MyHomePage extends StatefulWidget {
   //tegar
   //pak atong
   //jisanbiucna
+<<<<<<< Updated upstream
+=======
+  //msksn
+
+>>>>>>> Stashed changes
   final String title;
 
   @override
