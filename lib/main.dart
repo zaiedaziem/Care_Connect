@@ -28,12 +28,9 @@ class MyHomePage extends StatefulWidget {
   //tegar
   //pak atong
   //jisanbiucna
-<<<<<<< Updated upstream
-=======
-  //msksn
+  //bla
 
->>>>>>> Stashed changes
-  final String title;
+final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
