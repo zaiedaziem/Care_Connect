@@ -1,4 +1,4 @@
-package com.example.qq
+package com.example.CareConnect
 
 import io.flutter.embedding.android.FlutterActivity
 
