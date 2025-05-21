@@ -72,7 +72,7 @@ class LoginView extends StatelessWidget {
                         margin: EdgeInsets.only(top: 50),
                         child: Center(
                           child: Text(
-                            "Login",
+                            "Care Connect",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 40,
