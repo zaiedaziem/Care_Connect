@@ -1,19 +1,5 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(SignUpApp());
-}
-
-class SignUpApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: SignUpScreen(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
 class SignUpScreen extends StatefulWidget {
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
@@ -88,7 +74,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 backgroundColor: Colors.teal,
                 minimumSize: Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30)),
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
               child: Text(
                 'Sign Up',
@@ -98,7 +85,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
             Spacer(),
             Center(
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  // Add navigation to LoginView if needed
+                },
                 child: Text.rich(
                   TextSpan(
                     text: "Don’t have an account? ",
@@ -142,8 +131,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         prefixIcon: Icon(Icons.lock),
         hintText: 'Enter your password',
         suffixIcon: IconButton(
-          icon:
-              Icon(obscurePassword ? Icons.visibility_off : Icons.visibility),
+          icon: Icon(obscurePassword ? Icons.visibility_off : Icons.visibility),
           onPressed: () {
             setState(() {
               obscurePassword = !obscurePassword;

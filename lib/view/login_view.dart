@@ -145,23 +145,28 @@ class LoginView extends StatelessWidget {
                   SizedBox(height: 30),
                   FadeInUp(
                     duration: Duration(milliseconds: 1900),
-                    child: Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        gradient: LinearGradient(
-                          colors: [
-                            Color.fromRGBO(143, 148, 251, 1),
-                            Color.fromRGBO(143, 148, 251, .6),
-                          ],
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacementNamed(context, '/dashboard');
+                      },
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: LinearGradient(
+                            colors: [
+                              Color.fromRGBO(143, 148, 251, 1),
+                              Color.fromRGBO(143, 148, 251, .6),
+                            ],
+                          ),
                         ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Login",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                        child: Center(
+                          child: Text(
+                            "Login",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -170,10 +175,15 @@ class LoginView extends StatelessWidget {
                   SizedBox(height: 70),
                   FadeInUp(
                     duration: Duration(milliseconds: 2000),
-                    child: Text(
-                      "Forgot Password?",
-                      style: TextStyle(
-                        color: Color.fromRGBO(143, 148, 251, 1),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/register');
+                      },
+                      child: Text(
+                        "Don't have an account? Sign Up",
+                        style: TextStyle(
+                          color: Color.fromRGBO(143, 148, 251, 1),
+                        ),
                       ),
                     ),
                   ),
