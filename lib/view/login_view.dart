@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 
 class LoginView extends StatelessWidget {
+  const LoginView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,9 +13,9 @@ class LoginView extends StatelessWidget {
           children: <Widget>[
             Container(
               height: 400,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/background.png'),
+                  image: AssetImage('images/background.png'),
                   fit: BoxFit.fill,
                 ),
               ),
@@ -24,11 +26,11 @@ class LoginView extends StatelessWidget {
                     width: 80,
                     height: 200,
                     child: FadeInUp(
-                      duration: Duration(seconds: 1),
+                      duration: const Duration(seconds: 1),
                       child: Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           image: DecorationImage(
-                            image: AssetImage('assets/images/light-1.png'),
+                            image: AssetImage('images/light-1.png'),
                           ),
                         ),
                       ),
@@ -39,11 +41,11 @@ class LoginView extends StatelessWidget {
                     width: 80,
                     height: 150,
                     child: FadeInUp(
-                      duration: Duration(milliseconds: 1200),
+                      duration: const Duration(milliseconds: 1200),
                       child: Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           image: DecorationImage(
-                            image: AssetImage('assets/images/light-2.png'),
+                            image: AssetImage('images/light-2.png'),
                           ),
                         ),
                       ),
@@ -55,11 +57,11 @@ class LoginView extends StatelessWidget {
                     width: 80,
                     height: 150,
                     child: FadeInUp(
-                      duration: Duration(milliseconds: 1300),
+                      duration: const Duration(milliseconds: 1300),
                       child: Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           image: DecorationImage(
-                            image: AssetImage('assets/images/clock.png'),
+                            image: AssetImage('images/clock.png'),
                           ),
                         ),
                       ),
@@ -67,10 +69,10 @@ class LoginView extends StatelessWidget {
                   ),
                   Positioned(
                     child: FadeInUp(
-                      duration: Duration(milliseconds: 1600),
+                      duration: const Duration(milliseconds: 1600),
                       child: Container(
-                        margin: EdgeInsets.only(top: 50),
-                        child: Center(
+                        margin: const EdgeInsets.only(top: 50),
+                        child: const Center(
                           child: Text(
                             "Care Connect",
                             style: TextStyle(
@@ -87,20 +89,20 @@ class LoginView extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(30.0),
+              padding: const EdgeInsets.all(30.0),
               child: Column(
                 children: <Widget>[
                   FadeInUp(
-                    duration: Duration(milliseconds: 1800),
+                    duration: const Duration(milliseconds: 1800),
                     child: Container(
-                      padding: EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: Color.fromRGBO(143, 148, 251, 1),
+                          color: const Color.fromRGBO(143, 148, 251, 1),
                         ),
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
                             color: Color.fromRGBO(143, 148, 251, .2),
                             blurRadius: 20.0,
@@ -111,8 +113,8 @@ class LoginView extends StatelessWidget {
                       child: Column(
                         children: <Widget>[
                           Container(
-                            padding: EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: const BoxDecoration(
                               border: Border(
                                 bottom: BorderSide(
                                   color: Color.fromRGBO(143, 148, 251, 1),
@@ -128,7 +130,7 @@ class LoginView extends StatelessWidget {
                             ),
                           ),
                           Container(
-                            padding: EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(8.0),
                             child: TextField(
                               obscureText: true,
                               decoration: InputDecoration(
@@ -142,9 +144,9 @@ class LoginView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   FadeInUp(
-                    duration: Duration(milliseconds: 1900),
+                    duration: const Duration(milliseconds: 1900),
                     child: GestureDetector(
                       onTap: () {
                         Navigator.pushReplacementNamed(context, '/dashboard');
@@ -153,14 +155,14 @@ class LoginView extends StatelessWidget {
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          gradient: LinearGradient(
+                          gradient: const LinearGradient(
                             colors: [
                               Color.fromRGBO(143, 148, 251, 1),
                               Color.fromRGBO(143, 148, 251, .6),
                             ],
                           ),
                         ),
-                        child: Center(
+                        child: const Center(
                           child: Text(
                             "Login",
                             style: TextStyle(
@@ -172,14 +174,14 @@ class LoginView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 70),
+                  const SizedBox(height: 70),
                   FadeInUp(
-                    duration: Duration(milliseconds: 2000),
+                    duration: const Duration(milliseconds: 2000),
                     child: GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(context, '/register');
                       },
-                      child: Text(
+                      child: const Text(
                         "Don't have an account? Sign Up",
                         style: TextStyle(
                           color: Color.fromRGBO(143, 148, 251, 1),

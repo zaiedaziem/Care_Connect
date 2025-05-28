@@ -2,10 +2,12 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(HospitalApp());
+  runApp(const HospitalApp());
 }
 
 class HospitalApp extends StatelessWidget {
+  const HospitalApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -15,11 +17,11 @@ class HospitalApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         fontFamily: 'Roboto',
       ),
-      home: HospitalListScreen(),
+      home: const HospitalListScreen(),
       routes: {
-        '/hospital1': (context) => HospitalBookingScreen(hospitalId: 1),
-        '/hospital2': (context) => HospitalBookingScreen(hospitalId: 2),
-        '/hospital3': (context) => HospitalBookingScreen(hospitalId: 3),
+        '/hospital1': (context) => const HospitalBookingScreen(hospitalId: 1),
+        '/hospital2': (context) => const HospitalBookingScreen(hospitalId: 2),
+        '/hospital3': (context) => const HospitalBookingScreen(hospitalId: 3),
       },
     );
   }
@@ -66,7 +68,7 @@ final List<Hospital> hospitals = [
     id: 1,
     name: 'Hospital Kuala Lumpur',
     location: 'Kuala Lumpur',
-    imageUrl: 'assets/images/hkl.png',
+    imageUrl: 'images/hkl.png',
     description:
         'Hospital Kuala Lumpur is one of the largest government hospitals in Malaysia, located in the heart of the capital city. It offers a wide range of specialist services and serves as a major referral and teaching hospital with advanced medical facilities and affordable care for the public.',
     contact: '+60 3-2615 5555',
@@ -75,24 +77,24 @@ final List<Hospital> hospitals = [
           id: 101,
           name: 'Dr. Ahmad Razak',
           specialty: 'Cardiology',
-          imageUrl: 'assets/images/muzam.jpeg'),
+          imageUrl: 'images/muzam.jpeg'),
       Doctor(
           id: 102,
           name: 'Dr. Siti Norazah',
           specialty: 'Neurology',
-          imageUrl: 'assets/images/drprmpn.jpeg'),
+          imageUrl: 'images/drprmpn.jpeg'),
       Doctor(
           id: 103,
           name: 'Dr. Chong Wei',
           specialty: 'Orthopedics',
-          imageUrl: 'assets/images/stone.jpeg'),
+          imageUrl: 'images/stone.jpeg'),
     ],
   ),
   Hospital(
     id: 2,
     name: 'Sunway Medical Centre',
     location: 'Kuala lumpur',
-    imageUrl: 'assets/images/sunway.png',
+    imageUrl: 'images/sunway.png',
     description:
         'Sunway Medical Centre, located in Bandar Sunway, is a leading private hospital offering comprehensive medical services with a focus on innovation and patient safety. It is part of the Sunway Education and Healthcare Group and is affiliated with top global medical institutions.',
     contact: '+60 4-222 7800',
@@ -101,24 +103,24 @@ final List<Hospital> hospitals = [
           id: 201,
           name: 'Dr. Lee Mei Ling',
           specialty: 'Oncology',
-          imageUrl: 'assets/images/drprmpn.jpeg'),
+          imageUrl: 'images/drprmpn.jpeg'),
       Doctor(
           id: 202,
           name: 'Dr. Rajesh Kumar',
           specialty: 'Pediatrics',
-          imageUrl: 'assets/images/muzam.jpeg'),
+          imageUrl: 'images/muzam.jpeg'),
       Doctor(
           id: 203,
           name: 'Dr. Nora Ismail',
           specialty: 'Dermatology',
-          imageUrl: 'assets/images/drprmpn.jpeg'),
+          imageUrl: 'images/drprmpn.jpeg'),
     ],
   ),
   Hospital(
     id: 3,
     name: 'Gleneagles Hospital ',
     location: 'Kuala Lumpur',
-    imageUrl: 'assets/images/gleanagles.png',
+    imageUrl: 'images/gleanagles.png',
     description:
         'Gleneagles Hospital Kuala Lumpur is a premier private hospital known for its high-quality healthcare services, modern technology, and personalized patient care. It specializes in cardiology, oncology, orthopedics, and other critical care disciplines, serving both local and international patients.',
     contact: '+60 7-225 3000',
@@ -127,33 +129,35 @@ final List<Hospital> hospitals = [
           id: 301,
           name: 'Dr. Tan Chee Keong',
           specialty: 'Dermatology',
-          imageUrl: 'assets/images/drprmpn.jpeg'),
+          imageUrl: 'images/drprmpn.jpeg'),
       Doctor(
           id: 302,
           name: 'Dr. Nurul Huda',
           specialty: 'Gynecology',
-          imageUrl: 'assets/images/drprmpn.jpeg'),
+          imageUrl: 'images/drprmpn.jpeg'),
       Doctor(
           id: 303,
           name: 'Dr. Andrew Lim',
           specialty: 'Gastroenterology',
-          imageUrl: 'assets/images/stone.jpeg'),
+          imageUrl: 'images/stone.jpeg'),
     ],
   ),
 ];
 
 // Hospital List Screen (Page 1)
 class HospitalListScreen extends StatelessWidget {
+  const HospitalListScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Malaysia Hospitals'),
+        title: const Text('Malaysia Hospitals'),
         centerTitle: true,
         elevation: 0,
       ),
       body: Container(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: ListView.builder(
           itemCount: hospitals.length,
           itemBuilder: (context, index) {
@@ -170,12 +174,12 @@ class HospitalListScreen extends StatelessWidget {
 class HospitalCard extends StatelessWidget {
   final Hospital hospital;
 
-  const HospitalCard({required this.hospital});
+  const HospitalCard({super.key, required this.hospital});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.only(bottom: 16.0),
+      margin: const EdgeInsets.only(bottom: 16.0),
       elevation: 4.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
@@ -188,7 +192,7 @@ class HospitalCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(12.0)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(12.0)),
               child: Image.asset(
                 hospital.imageUrl,
                 height: 180,
@@ -207,22 +211,22 @@ class HospitalCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     hospital.name,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8.0),
+                  const SizedBox(height: 8.0),
                   Row(
                     children: [
-                      Icon(Icons.location_on, size: 16.0, color: Colors.blue),
-                      SizedBox(width: 4.0),
+                      const Icon(Icons.location_on, size: 16.0, color: Colors.blue),
+                      const SizedBox(width: 4.0),
                       Text(
                         hospital.location,
                         style: TextStyle(
@@ -232,28 +236,28 @@ class HospitalCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   Text(
                     '${hospital.doctors.length} Doctors Available',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14.0,
                       color: Colors.blue,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/hospital${hospital.id}');
                     },
-                    child: Text('Book Appointment'),
                     style: ElevatedButton.styleFrom(
                       padding:
-                          EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
+                    child: const Text('Book Appointment'),
                   ),
                 ],
               ),
@@ -269,7 +273,7 @@ class HospitalCard extends StatelessWidget {
 class HospitalBookingScreen extends StatefulWidget {
   final int hospitalId;
 
-  HospitalBookingScreen({required this.hospitalId});
+  const HospitalBookingScreen({super.key, required this.hospitalId});
 
   @override
   _HospitalBookingScreenState createState() => _HospitalBookingScreenState();
@@ -283,8 +287,8 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
   final notesController = TextEditingController();
-  DateTime selectedDate = DateTime.now().add(Duration(days: 1));
-  TimeOfDay selectedTime = TimeOfDay(hour: 9, minute: 0);
+  DateTime selectedDate = DateTime.now().add(const Duration(days: 1));
+  TimeOfDay selectedTime = const TimeOfDay(hour: 9, minute: 0);
 
   @override
   void initState() {
@@ -306,7 +310,7 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(Duration(days: 90)),
+      lastDate: DateTime.now().add(const Duration(days: 90)),
     );
     if (picked != null && picked != selectedDate) {
       setState(() {
@@ -334,19 +338,19 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Appointment Confirmed'),
+            title: const Text('Appointment Confirmed'),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
                   Text(
                       'Thank you for booking an appointment at ${hospital.name}.'),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                       'Doctor: ${selectedDoctor!.name} (${selectedDoctor!.specialty})'),
                   Text(
                       'Date: ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'),
                   Text('Time: ${selectedTime.format(context)}'),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                       'We will send a confirmation to ${emailController.text}'),
                 ],
@@ -354,13 +358,13 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
             ),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => HospitalListScreen()),
+                        builder: (context) => const HospitalListScreen()),
                   );
                 },
               ),
@@ -370,7 +374,7 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
       );
     } else if (selectedDoctor == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select a doctor')),
+        const SnackBar(content: Text('Please select a doctor')),
       );
     }
   }
@@ -402,42 +406,42 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                 ),
               ),
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
                       hospital.name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 8.0),
+                    const SizedBox(height: 8.0),
                     Row(
                       children: [
-                        Icon(Icons.location_on,
+                        const Icon(Icons.location_on,
                             color: Colors.white, size: 16.0),
-                        SizedBox(width: 4.0),
+                        const SizedBox(width: 4.0),
                         Text(
                           hospital.location,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16.0,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 4.0),
+                    const SizedBox(height: 4.0),
                     Row(
                       children: [
-                        Icon(Icons.phone, color: Colors.white, size: 16.0),
-                        SizedBox(width: 4.0),
+                        const Icon(Icons.phone, color: Colors.white, size: 16.0),
+                        const SizedBox(width: 4.0),
                         Text(
                           hospital.contact,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14.0,
                           ),
@@ -451,18 +455,18 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
 
             // Hospital description
             Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'About',
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8.0),
+                  const SizedBox(height: 8.0),
                   Text(
                     hospital.description,
                     style: TextStyle(
@@ -476,19 +480,19 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
 
             // Doctors section
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Select Doctor',
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8.0),
-                  Container(
+                  const SizedBox(height: 8.0),
+                  SizedBox(
                     height: 140,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
@@ -504,7 +508,7 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                           },
                           child: Container(
                             width: 120,
-                            margin: EdgeInsets.only(right: 12.0),
+                            margin: const EdgeInsets.only(right: 12.0),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12.0),
                               border: Border.all(
@@ -524,16 +528,16 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                                   onBackgroundImageError:
                                       (exception, stackTrace) {},
                                 ),
-                                SizedBox(height: 8.0),
+                                const SizedBox(height: 8.0),
                                 Text(
                                   doctor.name,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12.0,
                                   ),
                                 ),
-                                SizedBox(height: 4.0),
+                                const SizedBox(height: 4.0),
                                 Text(
                                   doctor.specialty,
                                   textAlign: TextAlign.center,
@@ -555,23 +559,23 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
 
             // Booking form
             Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Book Appointment',
                       style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     TextFormField(
                       controller: nameController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Full Name',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.person),
@@ -583,10 +587,10 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     TextFormField(
                       controller: emailController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Email',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.email),
@@ -601,10 +605,10 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     TextFormField(
                       controller: phoneController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Phone Number',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.phone),
@@ -617,14 +621,14 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     Row(
                       children: [
                         Expanded(
                           child: GestureDetector(
                             onTap: () => _selectDate(context),
                             child: Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 16),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey),
@@ -632,24 +636,24 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.calendar_today,
+                                  const Icon(Icons.calendar_today,
                                       color: Colors.blue),
-                                  SizedBox(width: 8),
+                                  const SizedBox(width: 8),
                                   Text(
                                     '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
-                                    style: TextStyle(fontSize: 16),
+                                    style: const TextStyle(fontSize: 16),
                                   ),
                                 ],
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(width: 16),
+                        const SizedBox(width: 16),
                         Expanded(
                           child: GestureDetector(
                             onTap: () => _selectTime(context),
                             child: Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 16),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey),
@@ -657,11 +661,11 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.access_time, color: Colors.blue),
-                                  SizedBox(width: 8),
+                                  const Icon(Icons.access_time, color: Colors.blue),
+                                  const SizedBox(width: 8),
                                   Text(
                                     selectedTime.format(context),
-                                    style: TextStyle(fontSize: 16),
+                                    style: const TextStyle(fontSize: 16),
                                   ),
                                 ],
                               ),
@@ -670,30 +674,30 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     TextFormField(
                       controller: notesController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Additional Notes',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.note),
                       ),
                       maxLines: 3,
                     ),
-                    SizedBox(height: 24.0),
+                    const SizedBox(height: 24.0),
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
                         onPressed: _submitForm,
-                        child: Text(
-                          'Confirm Booking',
-                          style: TextStyle(fontSize: 16),
-                        ),
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
+                        ),
+                        child: const Text(
+                          'Confirm Booking',
+                          style: TextStyle(fontSize: 16),
                         ),
                       ),
                     ),
