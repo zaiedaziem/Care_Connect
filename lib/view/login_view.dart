@@ -1,8 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:animate_do/animate_do.dart';
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
   const LoginView({super.key});
+
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<void> login() async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+      Navigator.pushReplacementNamed(context, '/dashboard');
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Login Failed"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            )
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,6 +45,7 @@ class LoginView extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
+            // --- HEADER DESIGN (same as before) ---
             Container(
               height: 400,
               decoration: const BoxDecoration(
@@ -88,6 +123,8 @@ class LoginView extends StatelessWidget {
                 ],
               ),
             ),
+
+            // --- FORM DESIGN ---
             Padding(
               padding: const EdgeInsets.all(30.0),
               child: Column(
@@ -122,9 +159,11 @@ class LoginView extends StatelessWidget {
                               ),
                             ),
                             child: TextField(
+                              controller: emailController,
+                              keyboardType: TextInputType.emailAddress,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "Email or Phone number",
+                                hintText: "Email",
                                 hintStyle: TextStyle(color: Colors.grey[700]),
                               ),
                             ),
@@ -132,6 +171,7 @@ class LoginView extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
+                              controller: passwordController,
                               obscureText: true,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
@@ -145,12 +185,12 @@ class LoginView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 30),
+
+                  // --- LOGIN BUTTON ---
                   FadeInUp(
                     duration: const Duration(milliseconds: 1900),
                     child: GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacementNamed(context, '/dashboard');
-                      },
+                      onTap: login,
                       child: Container(
                         height: 50,
                         decoration: BoxDecoration(
@@ -175,6 +215,8 @@ class LoginView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 70),
+
+                  // --- REGISTER LINK ---
                   FadeInUp(
                     duration: const Duration(milliseconds: 2000),
                     child: GestureDetector(
