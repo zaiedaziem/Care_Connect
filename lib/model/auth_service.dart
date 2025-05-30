@@ -10,4 +10,12 @@ class AuthService {
     );
     return userCredential.user;
   }
+
+  Future<User?> register(String email, String password) async {
+    final userCredential = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return userCredential.user;
+  }
 }

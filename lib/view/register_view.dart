@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../view_model/register_view_model.dart'; // Adjust path if needed
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -13,6 +15,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final registerVM = Provider.of<RegisterViewModel>(context);
+
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(color: Colors.black),
@@ -29,11 +33,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),
-            buildTextField(Icons.person, 'Enter your name'),
+            buildTextField(
+                Icons.person, 'Enter your name', registerVM.nameController),
             const SizedBox(height: 16),
-            buildTextField(Icons.email, 'Enter your email'),
+            buildTextField(
+                Icons.email, 'Enter your email', registerVM.emailController),
             const SizedBox(height: 16),
-            buildPasswordField(),
+            buildPasswordField(registerVM),
             const SizedBox(height: 16),
             Row(
               children: [
@@ -71,7 +77,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: agreeToTerms ? () {} : null,
+              onPressed: agreeToTerms && !registerVM.isLoading
+                  ? () async {
+                      final user = await registerVM.registerUser();
+                      if (user != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Account created!')),
+                        );
+                        // TODO: Navigate to home screen or login
+                      } else if (registerVM.errorMessage != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(registerVM.errorMessage!)),
+                        );
+                      }
+                    }
+                  : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal,
                 minimumSize: const Size(double.infinity, 50),
@@ -79,10 +99,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-              child: const Text(
-                'Sign Up',
-                style: TextStyle(fontSize: 16),
-              ),
+              child: registerVM.isLoading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text(
+                      'Sign Up',
+                      style: TextStyle(fontSize: 16),
+                    ),
             ),
             const Spacer(),
             Center(
@@ -111,8 +133,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget buildTextField(IconData icon, String hintText) {
+  Widget buildTextField(
+      IconData icon, String hintText, TextEditingController controller) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
         prefixIcon: Icon(icon),
         hintText: hintText,
@@ -126,8 +150,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget buildPasswordField() {
+  Widget buildPasswordField(RegisterViewModel registerVM) {
     return TextField(
+      controller: registerVM.passwordController,
       obscureText: obscurePassword,
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.lock),
@@ -148,5 +173,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    Provider.of<RegisterViewModel>(context, listen: false).disposeControllers();
+    super.dispose();
   }
 }

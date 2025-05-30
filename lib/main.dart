@@ -7,6 +7,7 @@ import 'view/register_view.dart';
 import 'view/clinic_dashboard.dart';
 
 import 'view_model/login_view_model.dart';
+import 'view_model/register_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +45,10 @@ class CareConnectApp extends StatelessWidget {
         initialRoute: '/',
         routes: {
           '/': (context) => const LoginView(),
-          '/register': (context) => const SignUpScreen(),
+          '/register': (context) => ChangeNotifierProvider<RegisterViewModel>(
+                create: (_) => RegisterViewModel(),
+                child: const SignUpScreen(),
+              ),
           '/dashboard': (context) => const ClinicDashboard(),
         },
       ),
