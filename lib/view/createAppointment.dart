@@ -1,5 +1,6 @@
 // main.dart
 import 'package:flutter/material.dart';
+import 'payment_screen.dart';
 
 void main() {
   runApp(const HospitalApp());
@@ -192,7 +193,8 @@ class HospitalCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12.0)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(12.0)),
               child: Image.asset(
                 hospital.imageUrl,
                 height: 180,
@@ -225,7 +227,8 @@ class HospitalCard extends StatelessWidget {
                   const SizedBox(height: 8.0),
                   Row(
                     children: [
-                      const Icon(Icons.location_on, size: 16.0, color: Colors.blue),
+                      const Icon(Icons.location_on,
+                          size: 16.0, color: Colors.blue),
                       const SizedBox(width: 4.0),
                       Text(
                         hospital.location,
@@ -251,8 +254,8 @@ class HospitalCard extends StatelessWidget {
                       Navigator.pushNamed(context, '/hospital${hospital.id}');
                     },
                     style: ElevatedButton.styleFrom(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
@@ -353,18 +356,42 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                   const SizedBox(height: 8),
                   Text(
                       'We will send a confirmation to ${emailController.text}'),
+                  const SizedBox(height: 16),
+                  const Text('Proceed to payment to secure your appointment.',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
             actions: <Widget>[
               TextButton(
-                child: const Text('OK'),
+                child: const Text('CANCEL'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.pushReplacement(
+                },
+              ),
+              ElevatedButton(
+                child: const Text('PROCEED TO PAYMENT'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  // Navigate to payment screen with all appointment details
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const HospitalListScreen()),
+                      builder: (context) => PaymentScreen(
+                        amount: 150.00, // Set your appointment fee
+                        appointmentDetails: {
+                          'hospital': hospital.name,
+                          'doctor': selectedDoctor!.name,
+                          'specialty': selectedDoctor!.specialty,
+                          'date':
+                              '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                          'time': selectedTime.format(context),
+                          'patientName': nameController.text,
+                          'patientEmail': emailController.text,
+                          'patientPhone': phoneController.text,
+                        },
+                      ),
+                    ),
                   );
                 },
               ),
@@ -437,7 +464,8 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                     const SizedBox(height: 4.0),
                     Row(
                       children: [
-                        const Icon(Icons.phone, color: Colors.white, size: 16.0),
+                        const Icon(Icons.phone,
+                            color: Colors.white, size: 16.0),
                         const SizedBox(width: 4.0),
                         Text(
                           hospital.contact,
@@ -661,7 +689,8 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.access_time, color: Colors.blue),
+                                  const Icon(Icons.access_time,
+                                      color: Colors.blue),
                                   const SizedBox(width: 8),
                                   Text(
                                     selectedTime.format(context),
