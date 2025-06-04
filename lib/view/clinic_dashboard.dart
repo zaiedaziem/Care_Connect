@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'createAppointment.dart';
 
 void main() {
   runApp(const ClinicApp());
@@ -35,7 +36,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
@@ -121,9 +122,9 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Search Bar
                     Container(
                       decoration: BoxDecoration(
@@ -224,9 +225,13 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                           child: _buildActionButton(
                             icon: Icons.calendar_today_outlined,
                             label: 'Schedule\nAppointment',
-                            gradient: const [Color(0xFF667eea), Color(0xFF764ba2)],
+                            gradient: const [
+                              Color(0xFF667eea),
+                              Color(0xFF764ba2)
+                            ],
                             onTap: () {
-                              // Handle appointment scheduling
+                              Navigator.pushNamed(context,
+                                  '/hospitals'); // Handle appointment scheduling
                             },
                           ),
                         ),
@@ -235,7 +240,10 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                           child: _buildActionButton(
                             icon: Icons.favorite_outline,
                             label: 'Health\nTips',
-                            gradient: const [Color(0xFFFF6B6B), Color(0xFFFF8E8E)],
+                            gradient: const [
+                              Color(0xFFFF6B6B),
+                              Color(0xFFFF8E8E)
+                            ],
                             onTap: () {
                               // Handle health tips
                             },
@@ -246,7 +254,10 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                           child: _buildActionButton(
                             icon: Icons.medical_services_outlined,
                             label: 'Emergency\nContacts',
-                            gradient: const [Color(0xFF4ECDC4), Color(0xFF44A08D)],
+                            gradient: const [
+                              Color(0xFF4ECDC4),
+                              Color(0xFF44A08D)
+                            ],
                             onTap: () {
                               // Handle emergency contacts
                             },
@@ -629,7 +640,7 @@ class _ModernClinicCard extends StatelessWidget {
               ),
             ],
           ),
-          
+
           // Content
           Padding(
             padding: const EdgeInsets.all(16),

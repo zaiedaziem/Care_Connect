@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'view/login_view.dart';
 import 'view/register_view.dart';
 import 'view/clinic_dashboard.dart';
+import 'view/createAppointment.dart';
 
 import 'view_model/login_view_model.dart';
 import 'view_model/register_view_model.dart';
@@ -45,11 +46,13 @@ class CareConnectApp extends StatelessWidget {
         initialRoute: '/',
         routes: {
           '/': (context) => const LoginView(),
-          '/register': (context) => ChangeNotifierProvider<RegisterViewModel>(
-                create: (_) => RegisterViewModel(),
-                child: const SignUpScreen(),
-              ),
+          '/register': (context) => const SignUpScreen(),
           '/dashboard': (context) => const ClinicDashboard(),
+          '/hospitals': (context) =>
+              const HospitalListScreen(), // This should exist
+          '/hospital1': (context) => const HospitalBookingScreen(hospitalId: 1),
+          '/hospital2': (context) => const HospitalBookingScreen(hospitalId: 2),
+          '/hospital3': (context) => const HospitalBookingScreen(hospitalId: 3),
         },
       ),
     );
