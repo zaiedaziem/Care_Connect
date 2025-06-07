@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 // App Title
                 Text(
-                  'Todo App',
+                  'Care Connect App',
                   style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.primary,
@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Sign in to manage your todos',
+                  'Sign in to the clinic app to view and manage your appointments.',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Colors.grey[600],
                   ),

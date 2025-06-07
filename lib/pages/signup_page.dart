@@ -46,7 +46,7 @@ class _SignUpPageState extends State<SignUpPage> {
               children: [
                 // Welcome Text
                 Text(
-                  'Join Todo App',
+                  'Join Care Connect App',
                   style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.primary,

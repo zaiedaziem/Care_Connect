@@ -28,7 +28,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Firebase Todo App',
+      debugShowCheckedModeBanner: false,
+      title: 'Care Connect',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
@@ -44,7 +45,7 @@ class AuthWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthService authService = AuthService();
-    
+
     return StreamBuilder<User?>(
       stream: authService.authStateChanges,
       builder: (context, snapshot) {
@@ -56,7 +57,7 @@ class AuthWrapper extends StatelessWidget {
             ),
           );
         }
-        
+
         // Error state
         if (snapshot.hasError) {
           return Scaffold(
@@ -84,12 +85,12 @@ class AuthWrapper extends StatelessWidget {
             ),
           );
         }
-        
+
         // User is logged in - show profile page directly
         if (snapshot.hasData && snapshot.data != null) {
           return const ProfilePage();
         }
-        
+
         // User is not logged in
         return const LoginPage();
       },
