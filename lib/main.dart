@@ -1,60 +1,98 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-import 'view/login_view.dart';
-import 'view/register_view.dart';
-import 'view/clinic_dashboard.dart';
-import 'view/createAppointment.dart';
-
-import 'view_model/login_view_model.dart';
-import 'view_model/register_view_model.dart';
+import 'pages/login_page.dart';
+import 'pages/profile_page.dart';
+import 'services/auth_service.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: "AIzaSyDTAMAvDT1b_d1xZUu8qihnGmukDfqKOn8",
-      authDomain: "careconnect-1601c.firebaseapp.com",
-      projectId: "careconnect-1601c",
-      storageBucket: "careconnect-1601c.firebasestorage.app",
-      messagingSenderId: "707193746787",
-      appId: "1:707193746787:web:17229c7323711c1ee88f56",
-      measurementId: "G-LK0Y7E1EZM",
-    ),
+    options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const CareConnectApp());
+  // Enable offline persistence for Firestore
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+  );
+
+  runApp(const MyApp());
 }
 
-class CareConnectApp extends StatelessWidget {
-  const CareConnectApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<LoginViewModel>(
-          create: (_) => LoginViewModel(),
-        ),
-        // Add more ViewModels here if needed
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Care Connect',
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const LoginView(),
-          '/register': (context) => const SignUpScreen(),
-          '/dashboard': (context) => const ClinicDashboard(),
-          '/hospitals': (context) =>
-              const HospitalListScreen(), // This should exist
-          '/hospital1': (context) => const HospitalBookingScreen(hospitalId: 1),
-          '/hospital2': (context) => const HospitalBookingScreen(hospitalId: 2),
-          '/hospital3': (context) => const HospitalBookingScreen(hospitalId: 3),
-        },
+    return MaterialApp(
+      title: 'Flutter Firebase Todo App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
       ),
+      home: const AuthWrapper(),
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final AuthService authService = AuthService();
+    
+    return StreamBuilder<User?>(
+      stream: authService.authStateChanges,
+      builder: (context, snapshot) {
+        // Loading state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+        
+        // Error state
+        if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Authentication Error',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Please restart the app',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        
+        // User is logged in - show profile page directly
+        if (snapshot.hasData && snapshot.data != null) {
+          return const ProfilePage();
+        }
+        
+        // User is not logged in
+        return const LoginPage();
+      },
     );
   }
 }

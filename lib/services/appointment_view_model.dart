@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../model/appointment_model.dart';
+import '../models/appointment_model.dart';
 
 class AppointmentViewModel extends ChangeNotifier {
   List<Appointment> _appointments = [
