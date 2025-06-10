@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'pages/login_page.dart';
 import 'pages/profile_page.dart';
+import 'pages/clinic_dashboard.dart'; // Import the correct dashboard
 import 'services/auth_service.dart';
 import 'firebase_options.dart';
 
@@ -86,9 +87,9 @@ class AuthWrapper extends StatelessWidget {
           );
         }
 
-        // User is logged in - show profile page directly
+        // User is logged in - show clinic dashboard
         if (snapshot.hasData && snapshot.data != null) {
-          return const ProfilePage();
+          return const ClinicDashboard(); // Changed to ClinicDashboard
         }
 
         // User is not logged in
