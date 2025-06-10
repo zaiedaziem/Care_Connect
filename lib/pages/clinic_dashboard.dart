@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'createAppointment.dart'; // Add this import
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'createAppointment.dart';
 import 'profile_page.dart';
 
 void main() {
@@ -32,6 +34,77 @@ class ClinicDashboard extends StatefulWidget {
 
 class _ClinicDashboardState extends State<ClinicDashboard> {
   final TextEditingController _searchController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  String userName = 'Loading...';
+  String greeting = 'Hello';
+  String? profileImageUrl;
+  int todayAppointments = 0;
+  double pendingPayments = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+    _fetchDashboardData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      final User? user = _auth.currentUser;
+      if (user != null) {
+        final DocumentSnapshot doc =
+            await _firestore.collection('users').doc(user.uid).get();
+
+        if (doc.exists) {
+          final data = doc.data() as Map<String, dynamic>;
+          setState(() {
+            userName = data['name'] ?? 'User';
+            profileImageUrl = data['profileImageUrl'];
+            greeting = _getGreeting();
+          });
+        }
+      }
+    } catch (e) {
+      setState(() {
+        userName = 'User';
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading user data: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _fetchDashboardData() async {
+    try {
+      // Simulate fetching appointments and payments
+      // Replace with actual Firestore queries
+      await Future.delayed(const Duration(seconds: 1));
+
+      setState(() {
+        todayAppointments = 5; // Replace with actual count
+        pendingPayments = 120.0; // Replace with actual amount
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading dashboard data: $e')),
+        );
+      }
+    }
+  }
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    return hour < 12
+        ? 'Good Morning'
+        : hour < 17
+            ? 'Good Afternoon'
+            : 'Good Evening';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,16 +142,16 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Good Morning',
+                              greeting,
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.8),
                                 fontSize: 16,
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
-                              'Dr. Sarah Damia',
-                              style: TextStyle(
+                            Text(
+                              userName,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -95,9 +168,12 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                               ),
                             );
                           },
-                          child: const CircleAvatar(
-                            backgroundImage: AssetImage('images/profile.png'),
+                          child: CircleAvatar(
                             radius: 20,
+                            backgroundImage: profileImageUrl != null
+                                ? NetworkImage(profileImageUrl!)
+                                : const AssetImage('images/profile.png')
+                                    as ImageProvider,
                           ),
                         ),
                       ],
@@ -146,7 +222,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                       child: _buildStatCard(
                         icon: Icons.event_available,
                         title: 'Today',
-                        subtitle: '5 Appointments',
+                        subtitle: '$todayAppointments Appointments',
                         color: const Color(0xFF10B981),
                       ),
                     ),
@@ -155,7 +231,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                       child: _buildStatCard(
                         icon: Icons.payment,
                         title: 'To Pay',
-                        subtitle: '\$120',
+                        subtitle: '\$$pendingPayments',
                         color: const Color(0xFF3B82F6),
                       ),
                     ),
@@ -332,6 +408,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
     );
   }
 
+  // Rest of your widget methods remain the same...
   Widget _buildStatCard({
     required IconData icon,
     required String title,
