@@ -19,15 +19,15 @@ class _ProfilePageState extends State<ProfilePage> {
   final AuthService _authService = AuthService();
   final UserService _userService = UserService();
   final _formKey = GlobalKey<FormState>();
-  
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _contactController = TextEditingController();
-  
+
   UserProfile? _userProfile;
   bool _isLoading = true;
   bool _isEditing = false;
   bool _isSaving = false;
-  
+
   // For web compatibility
   Uint8List? _selectedImageBytes;
   File? _selectedImageFile;
@@ -80,11 +80,11 @@ class _ProfilePageState extends State<ProfilePage> {
         maxHeight: 512,
         imageQuality: 80,
       );
-      
+
       if (image != null) {
         // Read image as bytes for web compatibility
         final Uint8List imageBytes = await image.readAsBytes();
-        
+
         setState(() {
           _selectedImageBytes = imageBytes;
           // Only set file for non-web platforms
@@ -112,15 +112,17 @@ class _ProfilePageState extends State<ProfilePage> {
 
     try {
       String? profilePictureUrl = _userProfile?.profilePictureUrl;
-      
+
       // Upload new image if selected
       if (_selectedImageBytes != null) {
         if (kIsWeb) {
           // For web, we need to upload the bytes directly
-          profilePictureUrl = await _userService.uploadProfilePictureBytes(_selectedImageBytes!);
+          profilePictureUrl = await _userService
+              .uploadProfilePictureBytes(_selectedImageBytes!);
         } else if (_selectedImageFile != null) {
           // For mobile, use the file
-          profilePictureUrl = await _userService.uploadProfilePicture(_selectedImageFile!);
+          profilePictureUrl =
+              await _userService.uploadProfilePicture(_selectedImageFile!);
         }
       }
 
@@ -211,12 +213,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
-                    
+
                     // Profile Picture Section
                     _buildProfilePictureSection(),
-                    
+
                     const SizedBox(height: 32),
-                    
+
                     // User Info Card
                     Card(
                       elevation: 2,
@@ -227,12 +229,15 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             Text(
                               'Personal Information',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                             const SizedBox(height: 16),
-                            
+
                             // Email (Read-only)
                             _buildInfoField(
                               label: 'Email',
@@ -240,9 +245,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               icon: Icons.email,
                               isReadOnly: true,
                             ),
-                            
+
                             const SizedBox(height: 16),
-                            
+
                             // Name Field
                             _isEditing
                                 ? TextFormField(
@@ -253,7 +258,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                       border: OutlineInputBorder(),
                                     ),
                                     validator: (value) {
-                                      if (value == null || value.trim().isEmpty) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
                                         return 'Please enter your name';
                                       }
                                       return null;
@@ -264,9 +270,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                     value: _userProfile?.name ?? 'Not set',
                                     icon: Icons.person,
                                   ),
-                            
+
                             const SizedBox(height: 16),
-                            
+
                             // Contact Field
                             _isEditing
                                 ? TextFormField(
@@ -278,8 +284,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                     keyboardType: TextInputType.phone,
                                     validator: (value) {
-                                      if (value != null && value.trim().isNotEmpty) {
-                                        if (!RegExp(r'^\+?[\d\s\-\(\)]+$').hasMatch(value)) {
+                                      if (value != null &&
+                                          value.trim().isNotEmpty) {
+                                        if (!RegExp(r'^\+?[\d\s\-\(\)]+$')
+                                            .hasMatch(value)) {
                                           return 'Please enter a valid contact number';
                                         }
                                       }
@@ -295,9 +303,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Save Button (only show when editing)
                     if (_isEditing)
                       SizedBox(
@@ -314,7 +322,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               ? const SizedBox(
                                   height: 20,
                                   width: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
                                 )
                               : const Text(
                                   'Save Changes',
@@ -322,9 +331,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                         ),
                       ),
-                    
+
                     const SizedBox(height: 32),
-                    
+
                     // Sign Out Button
                     SizedBox(
                       width: double.infinity,
