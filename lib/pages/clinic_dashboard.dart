@@ -269,7 +269,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const HospitalListScreen(),
+                                    const HospitalBookingScreen(hospitalId: 1),
                               ),
                             );
                           },

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/appointment_model.dart';
 
 class AppointmentViewModel extends ChangeNotifier {
-  List<Appointment> _appointments = [
+  final List<Appointment> _appointments = [
     Appointment(
       doctorName: "Dr Marcus",
       hospitalName: "Gleaneagles Hospital",

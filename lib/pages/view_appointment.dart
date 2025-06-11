@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/appointment_view_model.dart';
-import '../models/appointment_model.dart';
 
 class ViewAppointment extends StatelessWidget {
   const ViewAppointment({super.key});
