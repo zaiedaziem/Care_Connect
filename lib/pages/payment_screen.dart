@@ -7,10 +7,10 @@ class PaymentScreen extends StatefulWidget {
   final Map<String, dynamic> appointmentDetails;
 
   const PaymentScreen({
-    Key? key,
+    super.key,
     required this.amount,
     required this.appointmentDetails,
-  }) : super(key: key);
+  });
 
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
@@ -51,10 +51,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   LengthLimitingTextInputFormatter(19),
                   _CardNumberFormatter(),
                 ],
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Card Number',
                   hintText: '4242 4242 4242 4242',
-                  prefixIcon: const Icon(Icons.credit_card),
+                  prefixIcon: Icon(Icons.credit_card),
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
@@ -72,9 +72,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
               // Cardholder Name
               TextFormField(
                 controller: _cardHolderController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Cardholder Name',
-                  prefixIcon: const Icon(Icons.person),
+                  prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
@@ -99,10 +99,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         LengthLimitingTextInputFormatter(4),
                         _ExpiryDateFormatter(),
                       ],
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Expiry Date',
                         hintText: 'MM/YY',
-                        prefixIcon: const Icon(Icons.calendar_today),
+                        prefixIcon: Icon(Icons.calendar_today),
                         border: OutlineInputBorder(),
                       ),
                       validator: (value) {
@@ -128,10 +128,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         FilteringTextInputFormatter.digitsOnly,
                         LengthLimitingTextInputFormatter(4),
                       ],
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'CVV',
                         hintText: '123',
-                        prefixIcon: const Icon(Icons.lock),
+                        prefixIcon: Icon(Icons.lock),
                         border: OutlineInputBorder(),
                       ),
                       validator: (value) {
@@ -164,7 +164,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ? const CircularProgressIndicator(color: Colors.white)
                       : Text(
                           'PAY RM ${widget.amount.toStringAsFixed(2)}',
-                          style: TextStyle(fontSize: 18),
+                          style: const TextStyle(fontSize: 18),
                         ),
                 ),
               ),

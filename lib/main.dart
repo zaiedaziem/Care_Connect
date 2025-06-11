@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'pages/login_page.dart';
-import 'pages/profile_page.dart';
 import 'pages/clinic_dashboard.dart'; // Import the correct dashboard
 import 'services/auth_service.dart';
 import 'firebase_options.dart';
