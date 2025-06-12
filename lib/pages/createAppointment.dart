@@ -1,32 +1,7 @@
-// main.dart
 import 'package:flutter/material.dart';
-import 'payment_screen.dart';
-
-void main() {
-  runApp(const HospitalApp());
-}
-
-class HospitalApp extends StatelessWidget {
-  const HospitalApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Malaysia Hospitals',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        fontFamily: 'Roboto',
-      ),
-      home: const HospitalListScreen(),
-      routes: {
-        '/hospital1': (context) => const HospitalBookingScreen(hospitalId: 1),
-        '/hospital2': (context) => const HospitalBookingScreen(hospitalId: 2),
-        '/hospital3': (context) => const HospitalBookingScreen(hospitalId: 3),
-      },
-    );
-  }
-}
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/AppointmentService.dart';
+import '../models/appointment_model.dart';
 
 // Model classes
 class Hospital {
@@ -187,7 +162,13 @@ class HospitalCard extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/hospital${hospital.id}');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  HospitalBookingScreen(hospitalId: hospital.id),
+            ),
+          );
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,7 +232,13 @@ class HospitalCard extends StatelessWidget {
                   const SizedBox(height: 16.0),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/hospital${hospital.id}');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              HospitalBookingScreen(hospitalId: hospital.id),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
@@ -272,7 +259,7 @@ class HospitalCard extends StatelessWidget {
   }
 }
 
-// Hospital Booking Screen (Pages 2-4, one for each hospital)
+// Hospital Booking Screen with Firebase Integration
 class HospitalBookingScreen extends StatefulWidget {
   final int hospitalId;
 
@@ -292,6 +279,9 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
   final notesController = TextEditingController();
   DateTime selectedDate = DateTime.now().add(const Duration(days: 1));
   TimeOfDay selectedTime = const TimeOfDay(hour: 9, minute: 0);
+
+  // Firebase service instance
+  final AppointmentService _appointmentService = AppointmentService();
 
   @override
   void initState() {
@@ -334,71 +324,120 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
     }
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate() && selectedDoctor != null) {
-      // Show confirmation dialog
+      // Check if user is authenticated
+      String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+      if (userId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('You need to be logged in to book an appointment'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // Show loading dialog
       showDialog(
         context: context,
+        barrierDismissible: false,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Appointment Confirmed'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  Text(
-                      'Thank you for booking an appointment at ${hospital.name}.'),
-                  const SizedBox(height: 8),
-                  Text(
-                      'Doctor: ${selectedDoctor!.name} (${selectedDoctor!.specialty})'),
-                  Text(
-                      'Date: ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'),
-                  Text('Time: ${selectedTime.format(context)}'),
-                  const SizedBox(height: 8),
-                  Text(
-                      'We will send a confirmation to ${emailController.text}'),
-                  const SizedBox(height: 16),
-                  const Text('Proceed to payment to secure your appointment.',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                ],
-              ),
+          return const AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Booking appointment..."),
+              ],
             ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('CANCEL'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              ElevatedButton(
-                child: const Text('PROCEED TO PAYMENT'),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                  // Navigate to payment screen with all appointment details
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PaymentScreen(
-                        amount: 150.00, // Set your appointment fee
-                        appointmentDetails: {
-                          'hospital': hospital.name,
-                          'doctor': selectedDoctor!.name,
-                          'specialty': selectedDoctor!.specialty,
-                          'date':
-                              '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
-                          'time': selectedTime.format(context),
-                          'patientName': nameController.text,
-                          'patientEmail': emailController.text,
-                          'patientPhone': phoneController.text,
-                        },
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
           );
         },
       );
+
+      try {
+        // Create appointment object for Firebase with all patient details
+        Appointment appointment = Appointment(
+          doctorName: selectedDoctor!.name,
+          hospitalName: hospital.name,
+          time: selectedTime.format(context),
+          date:
+              '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+          status: 'Upcoming',
+          userId: userId,
+          patientName: nameController.text.trim(),
+          patientEmail: emailController.text.trim(),
+          patientPhone: phoneController.text.trim(),
+          notes: notesController.text.trim(),
+          createdAt: DateTime.now(),
+        );
+
+        // Save to Firebase
+        await _appointmentService.bookAppointment(appointment);
+
+        // Close loading dialog
+        Navigator.of(context).pop();
+
+        // Show confirmation dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Appointment Confirmed'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    Text(
+                        'Thank you for booking an appointment at ${hospital.name}.'),
+                    const SizedBox(height: 8),
+                    Text('Patient: ${nameController.text}'),
+                    Text(
+                        'Doctor: ${selectedDoctor!.name} (${selectedDoctor!.specialty})'),
+                    Text(
+                        'Date: ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'),
+                    Text('Time: ${selectedTime.format(context)}'),
+                    Text('Phone: ${phoneController.text}'),
+                    if (notesController.text.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text('Notes: ${notesController.text}'),
+                    ],
+                    const SizedBox(height: 8),
+                    Text(
+                        'We will send a confirmation to ${emailController.text}'),
+                    const SizedBox(height: 16),
+                    const Text('Your appointment has been saved successfully!',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        )),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close dialog
+                    Navigator.of(context).pop(); // Go back to hospital list
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } catch (e) {
+        // Close loading dialog
+        Navigator.of(context).pop();
+
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to book appointment: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } else if (selectedDoctor == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a doctor')),

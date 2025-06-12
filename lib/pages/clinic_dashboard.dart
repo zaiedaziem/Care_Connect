@@ -134,7 +134,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                 ),
                 child: Column(
                   children: [
-                    // Top Bar with Profile
+                    // Top Bar with Profile and View Appointments
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -159,22 +159,28 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                             ),
                           ],
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ProfilePage(),
+                        Row(
+                          children: [
+                            const SizedBox(width: 12),
+                            // Profile Avatar
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ProfilePage(),
+                                  ),
+                                );
+                              },
+                              child: CircleAvatar(
+                                radius: 20,
+                                backgroundImage: profileImageUrl != null
+                                    ? NetworkImage(profileImageUrl!)
+                                    : const AssetImage('images/profile.png')
+                                        as ImageProvider,
                               ),
-                            );
-                          },
-                          child: CircleAvatar(
-                            radius: 20,
-                            backgroundImage: profileImageUrl != null
-                                ? NetworkImage(profileImageUrl!)
-                                : const AssetImage('images/profile.png')
-                                    as ImageProvider,
-                          ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -255,6 +261,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    // First row of action buttons
                     Row(
                       children: [
                         _buildActionButton(
@@ -269,7 +276,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const HospitalBookingScreen(hospitalId: 1),
+                                    const HospitalListScreen(),
                               ),
                             );
                           },
@@ -286,7 +293,12 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                             // Add health tips navigation
                           },
                         ),
-                        const SizedBox(width: 16),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Second row of action buttons
+                    Row(
+                      children: [
                         _buildActionButton(
                           icon: Icons.medical_services_outlined,
                           label: 'Emergency\nContacts',
@@ -298,6 +310,11 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                             // Add emergency contacts navigation
                           },
                         ),
+                        const SizedBox(width: 16),
+                        // Empty spacer buttons to maintain layout
+                        Expanded(child: Container()),
+                        const SizedBox(width: 16),
+                        Expanded(child: Container()),
                       ],
                     ),
                   ],
