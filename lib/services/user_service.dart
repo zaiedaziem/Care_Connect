@@ -18,10 +18,8 @@ class UserService {
     }
 
     try {
-      final doc = await _firestore
-          .collection('users')
-          .doc(_currentUserId)
-          .get();
+      final doc =
+          await _firestore.collection('users').doc(_currentUserId).get();
 
       if (doc.exists) {
         return UserProfile.fromJson(doc.data()!);
@@ -53,10 +51,10 @@ class UserService {
     try {
       // Convert bytes to base64
       String base64Image = base64Encode(imageBytes);
-      
+
       // Store as data URL (you can also just store the base64 string)
       String dataUrl = 'data:image/jpeg;base64,$base64Image';
-      
+
       return dataUrl;
     } catch (e) {
       throw Exception('Failed to process image: $e');
@@ -68,7 +66,7 @@ class UserService {
     try {
       // Read file as bytes
       Uint8List imageBytes = await imageFile.readAsBytes();
-      
+
       // Use the same method as bytes upload
       return await uploadProfilePictureBytes(imageBytes);
     } catch (e) {
@@ -83,13 +81,10 @@ class UserService {
     }
 
     try {
-      await _firestore
-          .collection('users')
-          .doc(_currentUserId)
-          .set({
-            'profilePictureUrl': profilePictureUrl,
-            'updatedAt': FieldValue.serverTimestamp(),
-          }, SetOptions(merge: true));
+      await _firestore.collection('users').doc(_currentUserId).set({
+        'profilePictureUrl': profilePictureUrl,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       throw Exception('Failed to update profile picture URL: $e');
     }
@@ -102,13 +97,10 @@ class UserService {
     }
 
     try {
-      await _firestore
-          .collection('users')
-          .doc(_currentUserId)
-          .set({
-            'profilePictureUrl': FieldValue.delete(),
-            'updatedAt': FieldValue.serverTimestamp(),
-          }, SetOptions(merge: true));
+      await _firestore.collection('users').doc(_currentUserId).set({
+        'profilePictureUrl': FieldValue.delete(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       throw Exception('Failed to remove profile picture URL: $e');
     }
