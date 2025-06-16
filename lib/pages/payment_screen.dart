@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'createAppointment.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'clinic_dashboard.dart';
 
 class PaymentScreen extends StatefulWidget {
   final double amount;
@@ -23,6 +25,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final TextEditingController _cvvController = TextEditingController();
   final TextEditingController _cardHolderController = TextEditingController();
   bool _isProcessing = false;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +34,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       appBar: AppBar(
         title: const Text('Payment'),
         centerTitle: true,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -38,11 +43,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Appointment Summary
               _buildAppointmentSummary(),
               const SizedBox(height: 30),
-
-              // Card Number Field
               TextFormField(
                 controller: _cardNumberController,
                 keyboardType: TextInputType.number,
@@ -68,8 +70,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 },
               ),
               const SizedBox(height: 20),
-
-              // Cardholder Name
               TextFormField(
                 controller: _cardHolderController,
                 decoration: const InputDecoration(
@@ -85,11 +85,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 },
               ),
               const SizedBox(height: 20),
-
-              // Row for Expiry + CVV
               Row(
                 children: [
-                  // Expiry Date
                   Expanded(
                     child: TextFormField(
                       controller: _expiryController,
@@ -117,8 +114,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     ),
                   ),
                   const SizedBox(width: 20),
-
-                  // CVV
                   Expanded(
                     child: TextFormField(
                       controller: _cvvController,
@@ -148,14 +143,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ],
               ),
               const SizedBox(height: 30),
-
-              // Pay Button
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
                   onPressed: _isProcessing ? null : _processPayment,
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF667eea),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -164,7 +158,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ? const CircularProgressIndicator(color: Colors.white)
                       : Text(
                           'PAY RM ${widget.amount.toStringAsFixed(2)}',
-                          style: const TextStyle(fontSize: 18),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                 ),
               ),
@@ -175,10 +172,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  // Appointment Summary Widget
   Widget _buildAppointmentSummary() {
     return Card(
       elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -186,20 +185,47 @@ class _PaymentScreenState extends State<PaymentScreen> {
           children: [
             const Text(
               'Appointment Summary',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const Divider(),
-            Text('Hospital: ${widget.appointmentDetails['hospitalName']}'),
-            Text('Doctor: ${widget.appointmentDetails['doctorName']}'),
-            Text(
-                'Date: ${widget.appointmentDetails['date']} at ${widget.appointmentDetails['time']}'),
-            const SizedBox(height: 10),
-            Text(
-              'Total Amount: RM ${widget.amount.toStringAsFixed(2)}',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.blue[700],
+                color: Color(0xFF667eea),
+              ),
+            ),
+            const Divider(),
+            const SizedBox(height: 8),
+            _buildDetailRow(
+                'Hospital', widget.appointmentDetails['hospitalName']),
+            _buildDetailRow('Doctor', widget.appointmentDetails['doctorName']),
+            _buildDetailRow(
+                'Specialty', widget.appointmentDetails['specialty']),
+            _buildDetailRow('Date', widget.appointmentDetails['date']),
+            _buildDetailRow('Time', widget.appointmentDetails['time']),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Total Amount:',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'RM ${widget.amount.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF667eea),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -208,28 +234,89 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  // Process Payment (Mock)
+  Widget _buildDetailRow(String label, String? value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: Text(
+              '$label:',
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value ?? 'Not specified',
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _processPayment() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isProcessing = true);
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      await _updateAppointmentStatus();
+      await _showSuccessDialog();
+      _navigateToClinicDashboard();
+    } catch (e) {
+      _showErrorDialog(e.toString());
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
+    }
+  }
 
-    setState(() => _isProcessing = false);
+  Future<void> _updateAppointmentStatus() async {
+    await _firestore
+        .collection('appointments')
+        .doc(widget.appointmentDetails['appointmentId'])
+        .update({
+      'isPaid': true,
+      'status': 'confirmed',
+      'paymentDate': FieldValue.serverTimestamp(),
+      'paymentAmount': widget.amount,
+    });
+  }
 
-    // Show success dialog
-    showDialog(
+  Future<void> _showSuccessDialog() async {
+    return showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text('Payment Successful'),
-        content: const Text('Your appointment has been confirmed!'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.check_circle, color: Colors.green, size: 48),
+            const SizedBox(height: 16),
+            Text(
+              'RM ${widget.amount.toStringAsFixed(2)} paid successfully',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text('Your appointment has been confirmed!'),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.popUntil(context, ModalRoute.withName('/dashboard'));
+              Navigator.of(context).pop();
+              _navigateToClinicDashboard();
             },
             child: const Text('OK'),
           ),
@@ -238,7 +325,31 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  // Validate Expiry Date (MM/YY)
+  void _navigateToClinicDashboard() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => const ClinicDashboard(),
+      ),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  void _showErrorDialog(String error) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Payment Failed'),
+        content: Text('Error: $error'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   bool _isValidExpiryDate(String value) {
     if (value.length != 5) return false;
     final parts = value.split('/');
@@ -268,7 +379,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 }
 
-// Formatters for Card Number (4444 4444 4444 4444)
 class _CardNumberFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -290,7 +400,6 @@ class _CardNumberFormatter extends TextInputFormatter {
   }
 }
 
-// Formatter for Expiry Date (MM/YY)
 class _ExpiryDateFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(

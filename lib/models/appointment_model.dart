@@ -1,17 +1,22 @@
 class Appointment {
+  final String?
+      id; // Make id optional since it won't exist before saving to Firestore
   final String doctorName;
   final String hospitalName;
   final String time;
   final String date;
-  final String status; // This could be 'Upcoming' initially.
-  final String userId; // User ID who booked the appointment.
-  final String patientName; // Patient's full name
-  final String patientEmail; // Patient's email
-  final String patientPhone; // Patient's phone number
-  final String notes; // Additional notes from patient
-  final DateTime createdAt; // When the appointment was created
+  final String status;
+  final String userId;
+  final String patientName;
+  final String patientEmail;
+  final String patientPhone;
+  final String notes;
+  final DateTime createdAt;
+  final bool isPaid;
+  final double amount;
 
   Appointment({
+    this.id,
     required this.doctorName,
     required this.hospitalName,
     required this.time,
@@ -23,11 +28,14 @@ class Appointment {
     required this.patientPhone,
     required this.notes,
     required this.createdAt,
+    required this.isPaid,
+    required this.amount,
   });
 
-  // Convert Appointment to a map for Firestore
+  // Convert to Map for Firestore
   Map<String, dynamic> toMap() {
     return {
+      if (id != null) 'id': id,
       'doctorName': doctorName,
       'hospitalName': hospitalName,
       'time': time,
@@ -38,24 +46,29 @@ class Appointment {
       'patientEmail': patientEmail,
       'patientPhone': patientPhone,
       'notes': notes,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'isPaid': isPaid,
+      'amount': amount,
     };
   }
 
-  // Convert from Firestore snapshot
+  // Create from Firestore document
   factory Appointment.fromMap(Map<String, dynamic> map) {
     return Appointment(
-      doctorName: map['doctorName'] ?? '',
-      hospitalName: map['hospitalName'] ?? '',
-      time: map['time'] ?? '',
-      date: map['date'] ?? '',
-      status: map['status'] ?? '',
-      userId: map['userId'] ?? '',
-      patientName: map['patientName'] ?? '',
-      patientEmail: map['patientEmail'] ?? '',
-      patientPhone: map['patientPhone'] ?? '',
-      notes: map['notes'] ?? '',
-      createdAt: DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
+      id: map['id'],
+      doctorName: map['doctorName'],
+      hospitalName: map['hospitalName'],
+      time: map['time'],
+      date: map['date'],
+      status: map['status'],
+      userId: map['userId'],
+      patientName: map['patientName'],
+      patientEmail: map['patientEmail'],
+      patientPhone: map['patientPhone'],
+      notes: map['notes'],
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
+      isPaid: map['isPaid'] ?? false,
+      amount: (map['amount'] as num).toDouble(),
     );
   }
 }

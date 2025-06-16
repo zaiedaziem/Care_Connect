@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'createAppointment.dart';
 import 'profile_page.dart';
+import 'UnpaidAppointmentsPage.dart';
+import 'paid_appointments_page.dart';
 
 void main() {
   runApp(const ClinicApp());
@@ -80,13 +83,25 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
 
   Future<void> _fetchDashboardData() async {
     try {
-      // Simulate fetching appointments and payments
-      // Replace with actual Firestore queries
-      await Future.delayed(const Duration(seconds: 1));
+      final currentUser = _auth.currentUser;
+      if (currentUser == null) return;
+
+      final unpaidQuery = await _firestore
+          .collection('appointments')
+          .where('patientEmail', isEqualTo: currentUser.email)
+          .where('isPaid', isEqualTo: false)
+          .where('status', isEqualTo: 'unpaid')
+          .get();
+
+      double totalUnpaid = 0.0;
+      for (var doc in unpaidQuery.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        totalUnpaid += (data['amount'] as num?)?.toDouble() ?? 0.0;
+      }
 
       setState(() {
-        todayAppointments = 5; // Replace with actual count
-        pendingPayments = 120.0; // Replace with actual amount
+        pendingPayments = totalUnpaid;
+        todayAppointments = unpaidQuery.size;
       });
     } catch (e) {
       if (mounted) {
@@ -234,11 +249,22 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: _buildStatCard(
-                        icon: Icons.payment,
-                        title: 'To Pay',
-                        subtitle: '\$$pendingPayments',
-                        color: const Color(0xFF3B82F6),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const UnpaidAppointmentsPage(),
+                            ),
+                          );
+                        },
+                        child: _buildStatCard(
+                          icon: Icons.payment,
+                          title: 'To Pay',
+                          subtitle: '\RM${pendingPayments.toStringAsFixed(2)}',
+                          color: const Color(0xFF3B82F6),
+                        ),
                       ),
                     ),
                   ],
@@ -311,10 +337,23 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                           },
                         ),
                         const SizedBox(width: 16),
-                        // Empty spacer buttons to maintain layout
-                        Expanded(child: Container()),
-                        const SizedBox(width: 16),
-                        Expanded(child: Container()),
+                        _buildActionButton(
+                          icon: Icons.payment,
+                          label: 'Paid\nAppointments',
+                          gradient: const [
+                            Color(0xFF10B981),
+                            Color(0xFF059669)
+                          ],
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const PaidAppointmentsPage(),
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ],
@@ -348,7 +387,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
 
               // Clinics List
               SizedBox(
-                height: 220,
+                height: 245,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.only(left: 24),
@@ -380,7 +419,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
 
               const SizedBox(height: 32),
 
-              // Recent Activity
+              // Updated Recent Activity Section
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
@@ -394,26 +433,78 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildActivityItem(
-                      icon: Icons.check_circle,
-                      title: 'Appointment Completed',
-                      subtitle: 'Dr. Michael Chen - Cardiology',
-                      time: '2 hours ago',
-                      iconColor: const Color(0xFF10B981),
-                    ),
-                    _buildActivityItem(
-                      icon: Icons.payment,
-                      title: 'Payment Received',
-                      subtitle: '\$50 Consultation Fee',
-                      time: 'Yesterday',
-                      iconColor: const Color(0xFF3B82F6),
-                    ),
-                    _buildActivityItem(
-                      icon: Icons.favorite,
-                      title: 'Health Tip Viewed',
-                      subtitle: '5 Ways to Improve Your Sleep',
-                      time: '1 day ago',
-                      iconColor: const Color(0xFFFF6B6B),
+                    StreamBuilder<QuerySnapshot>(
+                      stream: _firestore
+                          .collection('appointments')
+                          .where('patientEmail',
+                              isEqualTo: _auth.currentUser?.email ?? '')
+                          .orderBy('createdAt', descending: true)
+                          .limit(3)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+
+                        if (snapshot.hasError) {
+                          debugPrint('Firestore Error: ${snapshot.error}');
+                          return Column(
+                            children: [
+                              Text(
+                                'Failed to load activities',
+                                style: TextStyle(color: Colors.red[400]),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Debug info: Querying for email ${_auth.currentUser?.email}',
+                                style: TextStyle(
+                                    color: Colors.grey[600], fontSize: 12),
+                              ),
+                            ],
+                          );
+                        }
+
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return Column(
+                            children: [
+                              Text(
+                                'No appointments yet',
+                                style: TextStyle(color: Colors.grey[600]),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Debug info: Querying for email ${_auth.currentUser?.email}',
+                                style: TextStyle(
+                                    color: Colors.grey[600], fontSize: 12),
+                              ),
+                            ],
+                          );
+                        }
+
+                        return Column(
+                          children: snapshot.data!.docs.map((doc) {
+                            final data = doc.data() as Map<String, dynamic>;
+                            final status =
+                                data['status']?.toString() ?? 'Upcoming';
+                            final doctorName =
+                                data['doctorName']?.toString() ?? 'Doctor';
+                            final hospitalName =
+                                data['hospitalName']?.toString() ?? 'Clinic';
+                            final time = data['time']?.toString() ?? '';
+                            final createdAt = data['createdAt'];
+
+                            return _buildActivityItem(
+                              icon: _getAppointmentIcon(status),
+                              title: 'Appointment with $doctorName',
+                              subtitle: '$hospitalName • $time',
+                              time: _formatTime(createdAt),
+                              iconColor: _getStatusColor(status),
+                            );
+                          }).toList(),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -425,7 +516,79 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
     );
   }
 
-  // Rest of your widget methods remain the same...
+  // Helper methods for Recent Activity
+  IconData _getAppointmentIcon(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return Icons.check_circle;
+      case 'confirmed':
+        return Icons.calendar_today;
+      case 'upcoming':
+        return Icons.access_time;
+      case 'cancelled':
+        return Icons.cancel;
+      default:
+        return Icons.event;
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return const Color(0xFF10B981); // Green
+      case 'confirmed':
+        return const Color(0xFF3B82F6); // Blue
+      case 'upcoming':
+        return const Color(0xFFF59E0B); // Amber
+      case 'cancelled':
+        return const Color(0xFFEF4444); // Red
+      default:
+        return const Color(0xFF6B7280); // Gray
+    }
+  }
+
+  String _formatTime(dynamic timestamp) {
+    if (timestamp == null) return 'Recently';
+
+    try {
+      DateTime date;
+      if (timestamp is Timestamp) {
+        date = timestamp.toDate();
+      } else if (timestamp is DateTime) {
+        date = timestamp;
+      } else if (timestamp is String) {
+        date = DateTime.parse(timestamp);
+      } else if (timestamp is int) {
+        date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      } else {
+        return 'Recently';
+      }
+
+      final now = DateTime.now();
+      final difference = now.difference(date);
+
+      if (difference.inSeconds < 60) {
+        return 'Just now';
+      } else if (difference.inMinutes < 60) {
+        final mins = difference.inMinutes;
+        return '$mins ${mins == 1 ? 'minute' : 'minutes'} ago';
+      } else if (difference.inHours < 24) {
+        final hours = difference.inHours;
+        return '$hours ${hours == 1 ? 'hour' : 'hours'} ago';
+      } else if (difference.inDays == 1) {
+        return 'Yesterday';
+      } else if (difference.inDays < 7) {
+        final days = difference.inDays;
+        return '$days ${days == 1 ? 'day' : 'days'} ago';
+      } else {
+        return DateFormat('MMM d, y').format(date);
+      }
+    } catch (e) {
+      debugPrint('Error formatting time: $e');
+      return 'Recently';
+    }
+  }
+
   Widget _buildStatCard({
     required IconData icon,
     required String title,
@@ -547,7 +710,13 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
               ],
             ),
           ),
-          Text(time),
+          Text(
+            time,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 12,
+            ),
+          ),
         ],
       ),
     );
