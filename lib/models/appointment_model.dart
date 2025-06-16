@@ -55,20 +55,40 @@ class Appointment {
   // Create from Firestore document
   factory Appointment.fromMap(Map<String, dynamic> map) {
     return Appointment(
-      id: map['id'],
-      doctorName: map['doctorName'],
-      hospitalName: map['hospitalName'],
-      time: map['time'],
-      date: map['date'],
-      status: map['status'],
-      userId: map['userId'],
-      patientName: map['patientName'],
-      patientEmail: map['patientEmail'],
-      patientPhone: map['patientPhone'],
-      notes: map['notes'],
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-      isPaid: map['isPaid'] ?? false,
-      amount: (map['amount'] as num).toDouble(),
+      doctorName: map['doctorName'] ?? '',
+      hospitalName: map['hospitalName'] ?? '',
+      time: map['time'] ?? '',
+      date: map['date'] ?? '',
+      status: map['status'] ?? '',
+      userId: map['userId'] ?? '',
+      patientName: map['patientName'] ?? '',
+      patientEmail: map['patientEmail'] ?? '',
+      patientPhone: map['patientPhone'] ?? '',
+      notes: map['notes'] ?? '',
+      createdAt:
+          DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
+      isPaid: map['isPaid'] ?? '',
+      amount: map['amount'] ?? '',
+    );
+  }
+}
+
+class ViewAppointment {
+  final String doctorName;
+  final String hospitalName;
+  final String time;
+
+  ViewAppointment({
+    required this.doctorName,
+    required this.hospitalName,
+    required this.time,
+  });
+
+  factory ViewAppointment.fromAppointment(ViewAppointment a) {
+    return ViewAppointment(
+      doctorName: a.doctorName,
+      hospitalName: a.hospitalName,
+      time: a.time,
     );
   }
 }

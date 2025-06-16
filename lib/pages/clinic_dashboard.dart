@@ -4,8 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'createAppointment.dart';
 import 'profile_page.dart';
-import 'UnpaidAppointmentsPage.dart';
+import 'view_appointment.dart';
 import 'paid_appointments_page.dart';
+import 'UnpaidAppointmentsPage.dart';
 
 void main() {
   runApp(const ClinicApp());
@@ -337,6 +338,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                           },
                         ),
                         const SizedBox(width: 16),
+
                         _buildActionButton(
                           icon: Icons.payment,
                           label: 'Paid\nAppointments',
@@ -354,6 +356,29 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                             );
                           },
                         ),
+                        const SizedBox(width: 16),
+
+                        _buildActionButton(
+                          icon: Icons.calendar_today_outlined,
+                          label: 'View\nAppointment',
+                          gradient: const [
+                            Color(0xFF4ECDC4),
+                            Color(0xFF44A08D)
+                          ],
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const ViewAppointmentPage(),
+                              ),
+                            );
+                          },
+                        ),
+                        // Empty spacer buttons to maintain layout
+                        Expanded(child: Container()),
+                        const SizedBox(width: 16),
+                        Expanded(child: Container()),
                       ],
                     ),
                   ],
