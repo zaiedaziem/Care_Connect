@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'createAppointment.dart';
 import 'profile_page.dart';
-import 'view_appointment.dart';
+import 'view_appointments.dart';
 import 'paid_appointments_page.dart';
 import 'UnpaidAppointmentsPage.dart';
 
@@ -370,7 +370,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const ViewAppointmentPage(),
+                                    const ViewAppointmentsScreen(),
                               ),
                             );
                           },

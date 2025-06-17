@@ -206,6 +206,28 @@ class AppointmentService {
     }
   }
 
+  // Add this method to your AppointmentService class
+  Future<List<Appointment>> getAppointmentsByEmail(String email) async {
+    try {
+      final query = _firestore
+          .collection('appointments')
+          .where('patientEmail', isEqualTo: email)
+          .orderBy('createdAt', descending: true);
+
+      final snapshot = await query.get();
+
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return Appointment.fromMap({
+          ...data,
+          'id': doc.id, // Include the document ID
+        });
+      }).toList();
+    } catch (e) {
+      throw Exception('Failed to get appointments by email: ${e.toString()}');
+    }
+  }
+
   /// Gets appointments by specific doctor
   Future<List<Appointment>> getAppointmentsByDoctor(String doctorName) async {
     return getUserAppointments(doctorName: doctorName);

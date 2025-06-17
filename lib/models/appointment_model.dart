@@ -1,6 +1,5 @@
 class Appointment {
-  final String?
-      id; // Make id optional since it won't exist before saving to Firestore
+  final String? id;
   final String doctorName;
   final String hospitalName;
   final String time;
@@ -32,7 +31,6 @@ class Appointment {
     required this.amount,
   });
 
-  // Convert to Map for Firestore
   Map<String, dynamic> toMap() {
     return {
       if (id != null) 'id': id,
@@ -52,9 +50,9 @@ class Appointment {
     };
   }
 
-  // Create from Firestore document
   factory Appointment.fromMap(Map<String, dynamic> map) {
     return Appointment(
+      id: map['id'],
       doctorName: map['doctorName'] ?? '',
       hospitalName: map['hospitalName'] ?? '',
       time: map['time'] ?? '',
@@ -65,30 +63,9 @@ class Appointment {
       patientEmail: map['patientEmail'] ?? '',
       patientPhone: map['patientPhone'] ?? '',
       notes: map['notes'] ?? '',
-      createdAt:
-          DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
-      isPaid: map['isPaid'] ?? '',
-      amount: map['amount'] ?? '',
-    );
-  }
-}
-
-class ViewAppointment {
-  final String doctorName;
-  final String hospitalName;
-  final String time;
-
-  ViewAppointment({
-    required this.doctorName,
-    required this.hospitalName,
-    required this.time,
-  });
-
-  factory ViewAppointment.fromAppointment(ViewAppointment a) {
-    return ViewAppointment(
-      doctorName: a.doctorName,
-      hospitalName: a.hospitalName,
-      time: a.time,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
+      isPaid: map['isPaid'] ?? false,
+      amount: (map['amount'] ?? 0.0).toDouble(),
     );
   }
 }
