@@ -118,6 +118,7 @@ class UserService {
     final profile = UserProfile(
       name: name,
       contact: contact,
+      userType: 'patient',
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );

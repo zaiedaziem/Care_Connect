@@ -129,6 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
         name: _nameController.text.trim(),
         contact: _contactController.text.trim(),
         profilePictureUrl: profilePictureUrl,
+        userType: _userProfile?.userType ?? 'patient',
         createdAt: _userProfile?.createdAt,
         updatedAt: DateTime.now(),
       );
