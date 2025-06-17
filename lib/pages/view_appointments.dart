@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/AppointmentService.dart';
 import '../models/appointment_model.dart';
+import '../models/hospital.dart';
+import 'createAppointment.dart';
 
 class ViewAppointmentsScreen extends StatefulWidget {
   const ViewAppointmentsScreen({super.key});
@@ -14,10 +17,22 @@ class _ViewAppointmentsScreenState extends State<ViewAppointmentsScreen> {
   final AppointmentService _appointmentService = AppointmentService();
   late Future<List<Appointment>> _appointmentsFuture;
   String? _userEmail;
+  String _selectedFilter = 'All';
+  final List<String> _filterOptions = [
+    'All',
+    'Confirmed',
+    'Pending',
+    'Cancelled',
+    'Completed'
+  ];
 
   @override
   void initState() {
     super.initState();
+    _loadAppointments();
+  }
+
+  void _loadAppointments() {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       _userEmail = user.email;
@@ -26,6 +41,75 @@ class _ViewAppointmentsScreenState extends State<ViewAppointmentsScreen> {
     } else {
       _appointmentsFuture = Future.value([]);
     }
+  }
+
+  Future<void> _deleteAppointment(String appointmentId) async {
+    try {
+      await _appointmentService.deleteAppointment(appointmentId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Appointment deleted successfully')),
+      );
+      setState(() {
+        _loadAppointments();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Failed to delete appointment: ${e.toString()}')),
+      );
+    }
+  }
+
+  void _confirmDelete(String appointmentId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content:
+              const Text('Are you sure you want to delete this appointment?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteAppointment(appointmentId);
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _editAppointment(Appointment appointment) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HospitalBookingScreen(
+          hospitalId: hospitals
+              .firstWhere((h) => h.name == appointment.hospitalName)
+              .id,
+          appointmentToEdit: appointment,
+        ),
+      ),
+    ).then((_) {
+      setState(() {
+        _loadAppointments();
+      });
+    });
+  }
+
+  List<Appointment> _filterAppointments(List<Appointment> appointments) {
+    if (_selectedFilter == 'All') return appointments;
+    return appointments
+        .where((appointment) =>
+            appointment.status.toLowerCase() == _selectedFilter.toLowerCase())
+        .toList();
   }
 
   @override
@@ -39,36 +123,79 @@ class _ViewAppointmentsScreenState extends State<ViewAppointmentsScreen> {
           ? const Center(
               child: Text('Please sign in to view your appointments'),
             )
-          : FutureBuilder<List<Appointment>>(
-              future: _appointmentsFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+          : Column(
+              children: [
+                // Status Filter Dropdown
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedFilter,
+                    decoration: InputDecoration(
+                      labelText: 'Filter by Status',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 12.0),
+                    ),
+                    items: _filterOptions.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedFilter = newValue!;
+                      });
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      setState(() {
+                        _loadAppointments();
+                      });
+                    },
+                    child: FutureBuilder<List<Appointment>>(
+                      future: _appointmentsFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
 
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
-                  );
-                }
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          );
+                        }
 
-                final appointments = snapshot.data ?? [];
+                        final appointments =
+                            _filterAppointments(snapshot.data ?? []);
 
-                if (appointments.isEmpty) {
-                  return const Center(
-                    child: Text('No appointments found'),
-                  );
-                }
+                        if (appointments.isEmpty) {
+                          return const Center(
+                            child: Text('No appointments found'),
+                          );
+                        }
 
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16.0),
-                  itemCount: appointments.length,
-                  itemBuilder: (context, index) {
-                    final appointment = appointments[index];
-                    return _buildAppointmentCard(appointment);
-                  },
-                );
-              },
+                        return ListView.builder(
+                          padding: const EdgeInsets.all(16.0),
+                          itemCount: appointments.length,
+                          itemBuilder: (context, index) {
+                            final appointment = appointments[index];
+                            return _buildAppointmentCard(appointment);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
     );
   }
@@ -88,22 +215,27 @@ class _ViewAppointmentsScreenState extends State<ViewAppointmentsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  appointment.hospitalName,
-                  style: const TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Chip(
-                  backgroundColor: _getStatusColor(appointment.status),
-                  label: Text(
-                    appointment.status.toUpperCase(),
+                Expanded(
+                  child: Text(
+                    appointment.hospitalName,
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12.0,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.blue),
+                      onPressed: () => _editAppointment(appointment),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => _confirmDelete(appointment.id!),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -137,6 +269,17 @@ class _ViewAppointmentsScreenState extends State<ViewAppointmentsScreen> {
                 const Icon(Icons.payment, size: 16.0),
                 const SizedBox(width: 8.0),
                 Text(appointment.isPaid ? 'Paid' : 'Unpaid'),
+                const Spacer(),
+                Chip(
+                  backgroundColor: _getStatusColor(appointment.status),
+                  label: Text(
+                    appointment.status.toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12.0,
+                    ),
+                  ),
+                ),
               ],
             ),
             if (appointment.notes.isNotEmpty) ...[
