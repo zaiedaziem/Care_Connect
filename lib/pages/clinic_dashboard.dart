@@ -377,7 +377,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                         ),
                         // Empty spacer buttons to maintain layout
                         Expanded(child: Container()),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 18),
                         Expanded(child: Container()),
                       ],
                     ),

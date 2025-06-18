@@ -1,0 +1,2 @@
+C:/Users/muzam/OneDrive/Documents/GitHub/Care_Connect/android/app/.cxx/Debug/65447393/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/muzam/OneDrive/Documents/GitHub/Care_Connect/android/app/.cxx/Debug/65447393/arm64-v8a/CMakeFiles/rebuild_cache.dir
