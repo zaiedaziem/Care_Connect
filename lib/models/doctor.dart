@@ -1,11 +1,11 @@
 class Doctor {
-  final int id;
+  final String? id;
   final String name;
   final String specialty;
   final String imageUrl;
 
   Doctor({
-    required this.id,
+    this.id,
     required this.name,
     required this.specialty,
     required this.imageUrl,
@@ -33,7 +33,7 @@ class Doctor {
 
   // Optional: create a copy with new values
   Doctor copyWith({
-    int? id,
+    String? id,
     String? name,
     String? specialty,
     String? imageUrl,

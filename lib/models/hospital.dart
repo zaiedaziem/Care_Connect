@@ -31,17 +31,14 @@ final List<Hospital> hospitals = [
     contact: '+60 3-2615 5555',
     doctors: [
       Doctor(
-          id: 101,
           name: 'Dr. Ahmad Razak',
           specialty: 'Cardiology',
           imageUrl: 'images/muzam.jpeg'),
       Doctor(
-          id: 102,
           name: 'Dr. Siti Norazah',
           specialty: 'Neurology',
           imageUrl: 'images/drprmpn.jpeg'),
       Doctor(
-          id: 103,
           name: 'Dr. Chong Wei',
           specialty: 'Orthopedics',
           imageUrl: 'images/stone.jpeg'),
@@ -57,17 +54,14 @@ final List<Hospital> hospitals = [
     contact: '+60 4-222 7800',
     doctors: [
       Doctor(
-          id: 201,
           name: 'Dr. Lee Mei Ling',
           specialty: 'Oncology',
           imageUrl: 'images/drprmpn.jpeg'),
       Doctor(
-          id: 202,
           name: 'Dr. Rajesh Kumar',
           specialty: 'Pediatrics',
           imageUrl: 'images/muzam.jpeg'),
       Doctor(
-          id: 203,
           name: 'Dr. Nora Ismail',
           specialty: 'Dermatology',
           imageUrl: 'images/drprmpn.jpeg'),
@@ -83,17 +77,14 @@ final List<Hospital> hospitals = [
     contact: '+60 7-225 3000',
     doctors: [
       Doctor(
-          id: 301,
           name: 'Dr. Tan Chee Keong',
           specialty: 'Dermatology',
           imageUrl: 'images/drprmpn.jpeg'),
       Doctor(
-          id: 302,
           name: 'Dr. Nurul Huda',
           specialty: 'Gynecology',
           imageUrl: 'images/drprmpn.jpeg'),
       Doctor(
-          id: 303,
           name: 'Dr. Andrew Lim',
           specialty: 'Gastroenterology',
           imageUrl: 'images/stone.jpeg'),

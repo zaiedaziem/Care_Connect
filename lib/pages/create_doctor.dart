@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/doctor.dart';
-import '../services/doctor_service.dart'; // Adjust import path
+import '../services/doctor_service.dart';
 
 class CreateDoctorPage extends StatefulWidget {
   const CreateDoctorPage({Key? key}) : super(key: key);
@@ -11,7 +11,6 @@ class CreateDoctorPage extends StatefulWidget {
 
 class _CreateDoctorPageState extends State<CreateDoctorPage> {
   final _formKey = GlobalKey<FormState>();
-  final _idController = TextEditingController();
   final _nameController = TextEditingController();
   final _specialtyController = TextEditingController();
   final _imageUrlController = TextEditingController();
@@ -27,7 +26,6 @@ class _CreateDoctorPageState extends State<CreateDoctorPage> {
       });
 
       final doctor = Doctor(
-        id: int.parse(_idController.text.trim()),
         name: _nameController.text.trim(),
         specialty: _specialtyController.text.trim(),
         imageUrl: _imageUrlController.text.trim(),
@@ -39,7 +37,6 @@ class _CreateDoctorPageState extends State<CreateDoctorPage> {
           const SnackBar(content: Text('Doctor created successfully!')),
         );
         _formKey.currentState!.reset();
-        _idController.clear();
         _nameController.clear();
         _specialtyController.clear();
         _imageUrlController.clear();
@@ -57,7 +54,6 @@ class _CreateDoctorPageState extends State<CreateDoctorPage> {
 
   @override
   void dispose() {
-    _idController.dispose();
     _nameController.dispose();
     _specialtyController.dispose();
     _imageUrlController.dispose();
@@ -76,16 +72,6 @@ class _CreateDoctorPageState extends State<CreateDoctorPage> {
           key: _formKey,
           child: Column(
             children: [
-              TextFormField(
-                controller: _idController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Doctor ID'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Please enter ID';
-                  if (int.tryParse(value) == null) return 'ID must be a number';
-                  return null;
-                },
-              ),
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Name'),

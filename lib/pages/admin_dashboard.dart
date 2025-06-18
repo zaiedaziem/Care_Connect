@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qq/pages/doctor_list.dart';
 import 'create_doctor.dart';
 
 class AdminDashboard extends StatelessWidget {
@@ -35,6 +36,12 @@ class AdminDashboard extends StatelessWidget {
               icon: Icons.list,
               onTap: () {
                 // Navigate to view doctor list screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DoctorListPage(),
+                  ),
+                );
               },
             ),
           ],
