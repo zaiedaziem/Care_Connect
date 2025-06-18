@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'pages/login_page.dart';
 import 'pages/clinic_dashboard.dart';
 import 'pages/doctor_dashboard.dart'; // Add this import
+import 'pages/admin_dashboard.dart'; // Add this import
 import 'services/auth_service.dart';
 import 'models/user_profile.dart'; // Add this import
 import 'firebase_options.dart';
@@ -189,7 +190,7 @@ class UserTypeRouter extends StatelessWidget {
 
         // Route user based on their userType
         final userProfile = snapshot.data;
-        
+
         if (userProfile == null) {
           // Handle case where user profile doesn't exist
           return Scaffold(
@@ -233,7 +234,7 @@ class UserTypeRouter extends StatelessWidget {
             return const DoctorDashboard();
           case 'admin':
             // You can add admin dashboard later
-            return const ClinicDashboard(); // Fallback to clinic dashboard for now
+            return const AdminDashboard(); // Fallback to clinic dashboard for now
           default:
             // Handle unknown user types
             return Scaffold(

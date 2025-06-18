@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'create_doctor.dart';
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
@@ -20,7 +21,13 @@ class AdminDashboard extends StatelessWidget {
               title: 'Register Doctor',
               icon: Icons.person_add,
               onTap: () {
-                // Navigate to register doctor screen
+                // Navigate to register doctor scree
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CreateDoctorPage(),
+                  ),
+                );
               },
             ),
             _DashboardCard(
