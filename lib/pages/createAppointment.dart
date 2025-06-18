@@ -384,8 +384,8 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                 const Text(
                     'Please complete payment to secure your appointment.'),
                 const SizedBox(height: 16),
-                Text('Amount: RM50.00',
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Amount: RM50.00',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
           ),

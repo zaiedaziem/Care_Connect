@@ -96,7 +96,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
 
       double totalUnpaid = 0.0;
       for (var doc in unpaidQuery.docs) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         totalUnpaid += (data['amount'] as num?)?.toDouble() ?? 0.0;
       }
 
@@ -263,7 +263,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                         child: _buildStatCard(
                           icon: Icons.payment,
                           title: 'To Pay',
-                          subtitle: '\RM${pendingPayments.toStringAsFixed(2)}',
+                          subtitle: 'RM${pendingPayments.toStringAsFixed(2)}',
                           color: const Color(0xFF3B82F6),
                         ),
                       ),

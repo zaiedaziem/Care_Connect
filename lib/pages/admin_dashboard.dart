@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class DoctorDashboard extends StatelessWidget {
-  const DoctorDashboard({super.key});
+class AdminDashboard extends StatelessWidget {
+  const AdminDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Doctor Dashboard'),
+        title: const Text('Admin Dashboard'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -17,31 +17,17 @@ class DoctorDashboard extends StatelessWidget {
           mainAxisSpacing: 16,
           children: [
             _DashboardCard(
-              title: 'Appointments',
-              icon: Icons.calendar_today,
+              title: 'Register Doctor',
+              icon: Icons.person_add,
               onTap: () {
-                // Navigate or perform an action
+                // Navigate to register doctor screen
               },
             ),
             _DashboardCard(
-              title: 'Patients',
-              icon: Icons.people,
+              title: 'Doctor List',
+              icon: Icons.list,
               onTap: () {
-                // Navigate or perform an action
-              },
-            ),
-            _DashboardCard(
-              title: 'Prescriptions',
-              icon: Icons.receipt_long,
-              onTap: () {
-                // Navigate or perform an action
-              },
-            ),
-            _DashboardCard(
-              title: 'Profile',
-              icon: Icons.person,
-              onTap: () {
-                // Navigate or perform an action
+                // Navigate to view doctor list screen
               },
             ),
           ],
@@ -57,6 +43,7 @@ class _DashboardCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _DashboardCard({
+    super.key,
     required this.title,
     required this.icon,
     required this.onTap,
@@ -64,17 +51,16 @@ class _DashboardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return Card(
+      elevation: 4,
+      child: InkWell(
+        onTap: onTap,
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 40, color: Theme.of(context).primaryColor),
-              const SizedBox(height: 12),
+              Icon(icon, size: 48),
+              const SizedBox(height: 8),
               Text(title, style: const TextStyle(fontSize: 16)),
             ],
           ),

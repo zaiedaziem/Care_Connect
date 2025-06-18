@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'pages/login_page.dart';
 import 'pages/clinic_dashboard.dart';
 import 'pages/doctor_dashboard.dart'; // Add this import
-import 'pages/paid_appointments_page.dart';
 import 'services/auth_service.dart';
 import 'models/user_profile.dart'; // Add this import
 import 'firebase_options.dart';

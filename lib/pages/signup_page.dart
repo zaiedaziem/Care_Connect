@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import 'dart:ui'; // for ImageFilter
+// for ImageFilter
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});

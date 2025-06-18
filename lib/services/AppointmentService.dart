@@ -217,7 +217,7 @@ class AppointmentService {
       final snapshot = await query.get();
 
       return snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         return Appointment.fromMap({
           ...data,
           'id': doc.id, // Include the document ID

@@ -772,7 +772,7 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   Widget _buildSignOutButton() {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 56,
       child: OutlinedButton(
