@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'doctor_list.dart';
 import 'create_doctor.dart';
+import '../services/auth_service.dart'; // Import AuthService
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final AuthService authService = AuthService(); // Initialize AuthService
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
@@ -22,7 +25,6 @@ class AdminDashboard extends StatelessWidget {
               title: 'Register Doctor',
               icon: Icons.person_add,
               onTap: () {
-                // Navigate to register doctor scree
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -35,13 +37,29 @@ class AdminDashboard extends StatelessWidget {
               title: 'Doctor List',
               icon: Icons.list,
               onTap: () {
-                // Navigate to view doctor list screen
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => DoctorListPage(),
                   ),
                 );
+              },
+            ),
+            _DashboardCard(
+              title: 'Logout',
+              icon: Icons.logout,
+              onTap: () async {
+                try {
+                  await authService.signOut();
+                  // StreamBuilder in main.dart will handle navigation to LoginPage
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Successfully signed out')),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error signing out: $e')),
+                  );
+                }
               },
             ),
           ],
@@ -57,7 +75,6 @@ class _DashboardCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _DashboardCard({
-    super.key,
     required this.title,
     required this.icon,
     required this.onTap,
@@ -73,9 +90,16 @@ class _DashboardCard extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 48),
+              Icon(
+                icon,
+                size: 48,
+                color: title == 'Logout' ? Colors.red : Theme.of(context).primaryColor, // Red for logout
+              ),
               const SizedBox(height: 8),
-              Text(title, style: const TextStyle(fontSize: 16)),
+              Text(
+                title,
+                style: const TextStyle(fontSize: 16),
+              ),
             ],
           ),
         ),

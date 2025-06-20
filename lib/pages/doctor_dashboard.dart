@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'doctor_appointments_screen.dart'; // Import your appointments screen
+import 'doctor_appointments_screen.dart';
+import '../services/auth_service.dart'; // Import AuthService
 
 class DoctorDashboard extends StatelessWidget {
   const DoctorDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final AuthService authService = AuthService(); // Initialize AuthService
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Doctor Dashboard'),
@@ -24,7 +27,7 @@ class DoctorDashboard extends StatelessWidget {
               title: 'Appointments',
               icon: Icons.calendar_today,
               color: Colors.blue,
-              count: 'Manage', // You can add actual count later
+              count: 'Manage',
               onTap: () {
                 Navigator.push(
                   context,
@@ -40,7 +43,6 @@ class DoctorDashboard extends StatelessWidget {
               color: Colors.green,
               count: 'View All',
               onTap: () {
-                // Navigate to patients page
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Patients page - Coming Soon!')),
                 );
@@ -52,7 +54,6 @@ class DoctorDashboard extends StatelessWidget {
               color: Colors.orange,
               count: 'Create',
               onTap: () {
-                // Navigate to prescriptions page
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Prescriptions page - Coming Soon!')),
                 );
@@ -64,7 +65,6 @@ class DoctorDashboard extends StatelessWidget {
               color: Colors.purple,
               count: 'Edit',
               onTap: () {
-                // Navigate to profile page
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Profile page - Coming Soon!')),
                 );
@@ -76,7 +76,6 @@ class DoctorDashboard extends StatelessWidget {
               color: Colors.teal,
               count: 'View',
               onTap: () {
-                // Navigate to reports page
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Reports page - Coming Soon!')),
                 );
@@ -88,10 +87,28 @@ class DoctorDashboard extends StatelessWidget {
               color: Colors.grey,
               count: 'Configure',
               onTap: () {
-                // Navigate to settings page
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Settings page - Coming Soon!')),
                 );
+              },
+            ),
+            _DashboardCard(
+              title: 'Logout',
+              icon: Icons.logout,
+              color: Colors.red,
+              count: 'Sign Out',
+              onTap: () async {
+                try {
+                  await authService.signOut();
+                  // StreamBuilder in main.dart will handle navigation to LoginPage
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Successfully signed out')),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error signing out: $e')),
+                  );
+                }
               },
             ),
           ],
