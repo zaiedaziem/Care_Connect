@@ -81,9 +81,10 @@ class DoctorListPage extends StatelessWidget {
                   leading: CircleAvatar(
                     radius: 30,
                     backgroundColor: Colors.blue.shade100,
-                    backgroundImage: doctor.imageUrl != null && doctor.imageUrl!.isNotEmpty
-                        ? NetworkImage(doctor.imageUrl!)
-                        : null,
+                    backgroundImage:
+                        doctor.imageUrl != null && doctor.imageUrl!.isNotEmpty
+                            ? NetworkImage(doctor.imageUrl!)
+                            : null,
                     child: doctor.imageUrl == null || doctor.imageUrl!.isEmpty
                         ? const Icon(
                             Icons.person,
@@ -127,7 +128,8 @@ class DoctorListPage extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: doctor.isActive ? Colors.green : Colors.red,
+                              color:
+                                  doctor.isActive ? Colors.green : Colors.red,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(

@@ -221,7 +221,7 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
 
       // Select the doctor
       selectedDoctor = hospital.doctors.firstWhere(
-        (d) => d.name == appointment.doctorName,
+        (d) => d.fullName == appointment.doctorName,
         orElse: () => hospital.doctors.first,
       );
     }
@@ -298,7 +298,7 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
       try {
         Appointment appointment = Appointment(
           id: _isEditing ? widget.appointmentToEdit!.id : null,
-          doctorName: selectedDoctor!.name,
+          doctorName: selectedDoctor!.fullName,
           hospitalName: hospital.name,
           time: selectedTime.format(context),
           date:
@@ -373,7 +373,7 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                 Text('Your appointment at ${hospital.name} is confirmed.'),
                 const SizedBox(height: 8),
                 Text(
-                    'Doctor: ${selectedDoctor!.name} (${selectedDoctor!.specialty})'),
+                    'Doctor: ${selectedDoctor!.fullName} (${selectedDoctor!.specialty})'),
                 Text(
                     'Date: ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'),
                 Text('Time: ${selectedTime.format(context)}'),
@@ -408,7 +408,7 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                       amount: 50.00,
                       appointmentDetails: {
                         'hospitalName': hospital.name,
-                        'doctorName': selectedDoctor!.name,
+                        'doctorName': selectedDoctor!.fullName,
                         'date':
                             '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
                         'time': selectedTime.format(context),
@@ -547,7 +547,8 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                       itemCount: hospital.doctors.length,
                       itemBuilder: (context, index) {
                         final doctor = hospital.doctors[index];
-                        final isSelected = selectedDoctor?.id == doctor.id;
+                        final isSelected =
+                            selectedDoctor?.doctorId == doctor.doctorId;
                         return GestureDetector(
                           onTap: () {
                             setState(() {
@@ -571,14 +572,16 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                               children: [
                                 CircleAvatar(
                                   radius: 30,
-                                  backgroundImage: AssetImage(doctor.imageUrl),
+                                  backgroundImage: doctor.imageUrl != null
+                                      ? AssetImage(doctor.imageUrl!)
+                                      : const AssetImage('images'),
                                   backgroundColor: Colors.grey[300],
                                   onBackgroundImageError:
                                       (exception, stackTrace) {},
                                 ),
                                 const SizedBox(height: 8.0),
                                 Text(
-                                  doctor.name,
+                                  doctor.fullName,
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
