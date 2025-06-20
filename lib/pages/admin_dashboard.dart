@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qq/pages/doctor_list.dart';
+import 'doctor_list.dart';
 import 'create_doctor.dart';
 
 class AdminDashboard extends StatelessWidget {
@@ -26,7 +26,7 @@ class AdminDashboard extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const CreateDoctorPage(),
+                    builder: (context) => const DoctorSignUpPage(),
                   ),
                 );
               },
