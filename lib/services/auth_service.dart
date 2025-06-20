@@ -1,71 +1,80 @@
+// auth_service.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/user_profile.dart'; // Adjust the import path as needed
+import '../models/user_profile.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
-  // Get current user
+
   User? get currentUser => _auth.currentUser;
-  
-  // Auth state stream
+
   Stream<User?> get authStateChanges => _auth.authStateChanges();
-  
-  // Sign in with email and password
+
   Future<UserCredential?> signInWithEmailPassword(String email, String password) async {
     try {
       UserCredential result = await _auth.signInWithEmailAndPassword(
-        email: email, 
-        password: password
+        email: email,
+        password: password,
       );
       return result;
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
     }
   }
-  
-  // Register with email and password
-  Future<UserCredential?> registerWithEmailPassword(String email, String password) async {
+
+  Future<UserCredential?> registerWithEmailPassword({
+    required String email,
+    required String password,
+    required String userType, // Added to support different user types
+    String? name, // Optional for patient/admin
+  }) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
-        email: email, 
-        password: password
+        email: email,
+        password: password,
       );
-      
-      // Create user profile in Firestore
+
       if (result.user != null) {
-        await _createUserProfile(result.user!.uid, email);
+        if (userType.toLowerCase() == 'doctor') {
+          // Doctors are created in doctors collection, likely via admin panel
+          // Do not create a user profile in users collection
+          return result;
+        } else {
+          await _createUserProfile(result.user!.uid, email, userType, name);
+        }
       }
-      
+
       return result;
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
     } catch (e) {
-      // If user was created but profile creation failed, delete the user
       if (_auth.currentUser != null) {
         await _auth.currentUser!.delete();
       }
       throw Exception('Failed to create user profile: ${e.toString()}');
     }
   }
-  
-  // Create user profile in Firestore
-  Future<void> _createUserProfile(String uid, String email) async {
+
+  Future<void> _createUserProfile(String uid, String email, String userType, String? name) async {
     try {
-      final userProfile = UserProfile.createPatient();
-      
+      final userProfile = UserProfile(
+        name: name ?? email.split('@')[0], // Default name from email if not provided
+        contact: null,
+        userType: userType.toLowerCase(),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
       await _firestore.collection('users').doc(uid).set(userProfile.toJson());
     } catch (e) {
       throw Exception('Failed to create user profile: ${e.toString()}');
     }
   }
-  
-  // Get user profile from Firestore
+
   Future<UserProfile?> getUserProfile(String uid) async {
     try {
       DocumentSnapshot doc = await _firestore.collection('users').doc(uid).get();
-      
       if (doc.exists) {
         return UserProfile.fromJson(doc.data() as Map<String, dynamic>);
       }
@@ -74,27 +83,24 @@ class AuthService {
       throw Exception('Failed to get user profile: ${e.toString()}');
     }
   }
-  
-  // Update user profile in Firestore
+
   Future<void> updateUserProfile(String uid, UserProfile userProfile) async {
     try {
       await _firestore.collection('users').doc(uid).update(
-        userProfile.copyWith(updatedAt: DateTime.now()).toJson()
+        userProfile.copyWith(updatedAt: DateTime.now()).toJson(),
       );
     } catch (e) {
       throw Exception('Failed to update user profile: ${e.toString()}');
     }
   }
-  
-  // Get current user profile
+
   Future<UserProfile?> getCurrentUserProfile() async {
     if (currentUser != null) {
       return await getUserProfile(currentUser!.uid);
     }
     return null;
   }
-  
-  // Stream of current user profile
+
   Stream<UserProfile?> get currentUserProfileStream {
     return authStateChanges.asyncMap((user) async {
       if (user != null) {
@@ -103,17 +109,15 @@ class AuthService {
       return null;
     });
   }
-  
-  // Sign out
+
   Future<void> signOut() async {
     try {
-      return await _auth.signOut();
+      await _auth.signOut();
     } catch (e) {
       throw Exception('Failed to sign out: ${e.toString()}');
     }
   }
-  
-  // Send password reset email
+
   Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
@@ -121,8 +125,7 @@ class AuthService {
       throw _handleAuthException(e);
     }
   }
-  
-  // Handle Firebase Auth exceptions
+
   String _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':

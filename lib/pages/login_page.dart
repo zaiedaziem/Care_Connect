@@ -1,3 +1,4 @@
+// login_page.dart
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'signup_page.dart';
@@ -9,8 +10,7 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage>
-    with TickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   final AuthService _authService = AuthService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -18,7 +18,7 @@ class _LoginPageState extends State<LoginPage>
 
   bool _isLoading = false;
   bool _obscurePassword = true;
-  
+
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
@@ -35,23 +35,15 @@ class _LoginPageState extends State<LoginPage>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutBack,
-    ));
-    
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
+
+    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutBack),
+    );
+
     _fadeController.forward();
     _slideController.forward();
   }
@@ -73,11 +65,7 @@ class _LoginPageState extends State<LoginPage>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF667eea),
-              Color(0xFF764ba2),
-              Color(0xFFf093fb),
-            ],
+            colors: [Color(0xFF667eea), Color(0xFF764ba2), Color(0xFFf093fb)],
             stops: [0.0, 0.5, 1.0],
           ),
         ),
@@ -94,19 +82,14 @@ class _LoginPageState extends State<LoginPage>
                     child: Card(
                       elevation: 20,
                       shadowColor: Colors.black.withOpacity(0.3),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(24),
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.white,
-                              Colors.grey.shade50,
-                            ],
+                            colors: [Colors.white, Colors.grey.shade50],
                           ),
                         ),
                         padding: const EdgeInsets.all(32.0),
@@ -116,7 +99,6 @@ class _LoginPageState extends State<LoginPage>
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // Logo/Icon
                               Container(
                                 height: 80,
                                 width: 80,
@@ -139,14 +121,8 @@ class _LoginPageState extends State<LoginPage>
                                     ),
                                   ],
                                 ),
-                                child: const Icon(
-                                  Icons.local_hospital_rounded,
-                                  size: 40,
-                                  color: Colors.white,
-                                ),
+                                child: const Icon(Icons.local_hospital_rounded, size: 40, color: Colors.white),
                               ),
-
-                              // App Title
                               Text(
                                 'Care Connect',
                                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -166,8 +142,6 @@ class _LoginPageState extends State<LoginPage>
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 40),
-
-                              // Email Field
                               _buildTextField(
                                 controller: _emailController,
                                 label: 'Email',
@@ -178,16 +152,13 @@ class _LoginPageState extends State<LoginPage>
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter your email';
                                   }
-                                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                      .hasMatch(value)) {
+                                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
                                     return 'Please enter a valid email address';
                                   }
                                   return null;
                                 },
                               ),
                               const SizedBox(height: 20),
-
-                              // Password Field
                               _buildTextField(
                                 controller: _passwordController,
                                 label: 'Password',
@@ -196,9 +167,7 @@ class _LoginPageState extends State<LoginPage>
                                 obscureText: _obscurePassword,
                                 suffixIcon: IconButton(
                                   icon: Icon(
-                                    _obscurePassword
-                                        ? Icons.visibility_outlined
-                                        : Icons.visibility_off_outlined,
+                                    _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                                     color: Colors.grey[600],
                                   ),
                                   onPressed: () {
@@ -218,8 +187,6 @@ class _LoginPageState extends State<LoginPage>
                                 },
                               ),
                               const SizedBox(height: 32),
-
-                              // Login Button
                               Container(
                                 height: 56,
                                 decoration: BoxDecoration(
@@ -245,9 +212,7 @@ class _LoginPageState extends State<LoginPage>
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.transparent,
                                     shadowColor: Colors.transparent,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                   ),
                                   child: _isLoading
                                       ? const SizedBox(
@@ -270,13 +235,9 @@ class _LoginPageState extends State<LoginPage>
                                 ),
                               ),
                               const SizedBox(height: 20),
-
-                              // Forgot Password
                               TextButton(
                                 onPressed: _forgotPassword,
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                ),
+                                style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 12)),
                                 child: Text(
                                   'Forgot Password?',
                                   style: TextStyle(
@@ -286,8 +247,6 @@ class _LoginPageState extends State<LoginPage>
                                 ),
                               ),
                               const SizedBox(height: 24),
-
-                              // Divider
                               Row(
                                 children: [
                                   Expanded(child: Divider(color: Colors.grey[300])),
@@ -295,18 +254,13 @@ class _LoginPageState extends State<LoginPage>
                                     padding: const EdgeInsets.symmetric(horizontal: 16),
                                     child: Text(
                                       'or',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                      style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w500),
                                     ),
                                   ),
                                   Expanded(child: Divider(color: Colors.grey[300])),
                                 ],
                               ),
                               const SizedBox(height: 24),
-
-                              // Sign Up Link
                               Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
@@ -319,18 +273,14 @@ class _LoginPageState extends State<LoginPage>
                                   children: [
                                     Text(
                                       "Don't have an account? ",
-                                      style: TextStyle(
-                                        color: Colors.grey[700],
-                                        fontWeight: FontWeight.w400,
-                                      ),
+                                      style: TextStyle(color: Colors.grey[700], fontWeight: FontWeight.w400),
                                     ),
                                     GestureDetector(
                                       onTap: () {
                                         Navigator.push(
                                           context,
                                           PageRouteBuilder(
-                                            pageBuilder: (context, animation, secondaryAnimation) =>
-                                                const SignUpPage(),
+                                            pageBuilder: (context, animation, secondaryAnimation) => const SignUpPage(),
                                             transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                               return SlideTransition(
                                                 position: Tween<Offset>(
@@ -383,23 +333,14 @@ class _LoginPageState extends State<LoginPage>
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
       ),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
         validator: validator,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-        ),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
@@ -410,11 +351,7 @@ class _LoginPageState extends State<LoginPage>
               color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
-              icon,
-              size: 20,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+            child: Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
           ),
           suffixIcon: suffixIcon,
           filled: true,
@@ -440,14 +377,8 @@ class _LoginPageState extends State<LoginPage>
             borderSide: const BorderSide(color: Colors.red, width: 2),
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          labelStyle: TextStyle(
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
-          ),
-          hintStyle: TextStyle(
-            color: Colors.grey[400],
-            fontWeight: FontWeight.w400,
-          ),
+          labelStyle: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w500),
+          hintStyle: TextStyle(color: Colors.grey[400], fontWeight: FontWeight.w400),
         ),
       ),
     );
@@ -465,7 +396,9 @@ class _LoginPageState extends State<LoginPage>
         _emailController.text.trim(),
         _passwordController.text,
       );
-      // Navigation will be handled by StreamBuilder in main.dart
+      // Clear form fields after successful login
+      _emailController.clear();
+      _passwordController.clear();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -474,7 +407,7 @@ class _LoginPageState extends State<LoginPage>
               children: [
                 const Icon(Icons.error_outline, color: Colors.white),
                 const SizedBox(width: 12),
-                Expanded(child: Text(e.toString())),
+                Expanded(child: Text('Login failed: ${e.toString()}')),
               ],
             ),
             backgroundColor: Colors.red[600],
@@ -540,7 +473,7 @@ class _LoginPageState extends State<LoginPage>
               children: [
                 const Icon(Icons.error_outline, color: Colors.white),
                 const SizedBox(width: 12),
-                Expanded(child: Text(e.toString())),
+                Expanded(child: Text('Error: ${e.toString()}')),
               ],
             ),
             backgroundColor: Colors.red[600],

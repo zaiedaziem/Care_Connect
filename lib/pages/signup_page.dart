@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-// for ImageFilter
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -9,19 +8,18 @@ class SignUpPage extends StatefulWidget {
   State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage>
-    with TickerProviderStateMixin {
+class _SignUpPageState extends State<SignUpPage> with TickerProviderStateMixin {
   final AuthService _authService = AuthService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController(); // Added for name
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  
+
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
@@ -38,23 +36,15 @@ class _SignUpPageState extends State<SignUpPage>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutBack,
-    ));
-    
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
+
+    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutBack),
+    );
+
     _fadeController.forward();
     _slideController.forward();
   }
@@ -64,6 +54,7 @@ class _SignUpPageState extends State<SignUpPage>
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _nameController.dispose(); // Dispose name controller
     _fadeController.dispose();
     _slideController.dispose();
     super.dispose();
@@ -77,11 +68,7 @@ class _SignUpPageState extends State<SignUpPage>
           gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
-            colors: [
-              Color(0xFF74b9ff),
-              Color(0xFF0984e3),
-              Color(0xFF6c5ce7),
-            ],
+            colors: [Color(0xFF74b9ff), Color(0xFF0984e3), Color(0xFF6c5ce7)],
             stops: [0.0, 0.5, 1.0],
           ),
         ),
@@ -97,7 +84,6 @@ class _SignUpPageState extends State<SignUpPage>
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
-                        // backdrop: const BoxDecoration(),
                       ),
                       child: IconButton(
                         icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
@@ -108,16 +94,15 @@ class _SignUpPageState extends State<SignUpPage>
                     Text(
                       'Create Account',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
                     const Spacer(),
-                    const SizedBox(width: 48), // Balance the back button
+                    const SizedBox(width: 48),
                   ],
                 ),
               ),
-              
               // Main Content
               Expanded(
                 child: Center(
@@ -132,19 +117,14 @@ class _SignUpPageState extends State<SignUpPage>
                           child: Card(
                             elevation: 25,
                             shadowColor: Colors.black.withOpacity(0.4),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(28),
                                 gradient: LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.white,
-                                    Colors.grey.shade50,
-                                  ],
+                                  colors: [Colors.white, Colors.grey.shade50],
                                 ),
                               ),
                               padding: const EdgeInsets.all(32.0),
@@ -154,36 +134,28 @@ class _SignUpPageState extends State<SignUpPage>
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
-                                    // Logo/Icon with different gradient
+                                    // Logo/Icon
                                     Container(
                                       height: 80,
                                       width: 80,
                                       margin: const EdgeInsets.only(bottom: 24),
-                                      decoration: BoxDecoration(
+                                      decoration: const BoxDecoration(
                                         shape: BoxShape.circle,
-                                        gradient: const LinearGradient(
+                                        gradient: LinearGradient(
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
-                                          colors: [
-                                            Color(0xFF74b9ff),
-                                            Color(0xFF6c5ce7),
-                                          ],
+                                          colors: [Color(0xFF74b9ff), Color(0xFF6c5ce7)],
                                         ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: const Color(0xFF74b9ff).withOpacity(0.4),
+                                            color: Color(0xFF74b9ff),
                                             blurRadius: 20,
-                                            offset: const Offset(0, 10),
+                                            offset: Offset(0, 10),
                                           ),
                                         ],
                                       ),
-                                      child: const Icon(
-                                        Icons.person_add_rounded,
-                                        size: 40,
-                                        color: Colors.white,
-                                      ),
+                                      child: const Icon(Icons.person_add_rounded, size: 40, color: Colors.white),
                                     ),
-
                                     // Welcome Text
                                     Text(
                                       'Join Care Connect',
@@ -204,7 +176,23 @@ class _SignUpPageState extends State<SignUpPage>
                                       textAlign: TextAlign.center,
                                     ),
                                     const SizedBox(height: 32),
-
+                                    // Name Field (Added)
+                                    _buildTextField(
+                                      controller: _nameController,
+                                      label: 'Full Name',
+                                      hint: 'Enter your full name',
+                                      icon: Icons.person_outline,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter your full name';
+                                        }
+                                        if (value.length < 2) {
+                                          return 'Name must be at least 2 characters';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    const SizedBox(height: 16),
                                     // Email Field
                                     _buildTextField(
                                       controller: _emailController,
@@ -216,15 +204,13 @@ class _SignUpPageState extends State<SignUpPage>
                                         if (value == null || value.isEmpty) {
                                           return 'Please enter your email';
                                         }
-                                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                            .hasMatch(value)) {
+                                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
                                           return 'Please enter a valid email address';
                                         }
                                         return null;
                                       },
                                     ),
                                     const SizedBox(height: 16),
-
                                     // Password Field
                                     _buildTextField(
                                       controller: _passwordController,
@@ -234,9 +220,7 @@ class _SignUpPageState extends State<SignUpPage>
                                       obscureText: _obscurePassword,
                                       suffixIcon: IconButton(
                                         icon: Icon(
-                                          _obscurePassword
-                                              ? Icons.visibility_outlined
-                                              : Icons.visibility_off_outlined,
+                                          _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                                           color: Colors.grey[600],
                                         ),
                                         onPressed: () {
@@ -256,7 +240,6 @@ class _SignUpPageState extends State<SignUpPage>
                                       },
                                     ),
                                     const SizedBox(height: 16),
-
                                     // Confirm Password Field
                                     _buildTextField(
                                       controller: _confirmPasswordController,
@@ -288,7 +271,6 @@ class _SignUpPageState extends State<SignUpPage>
                                       },
                                     ),
                                     const SizedBox(height: 24),
-
                                     // Password Strength Indicator
                                     Container(
                                       padding: const EdgeInsets.all(12),
@@ -299,11 +281,7 @@ class _SignUpPageState extends State<SignUpPage>
                                       ),
                                       child: Row(
                                         children: [
-                                          Icon(
-                                            Icons.info_outline,
-                                            size: 16,
-                                            color: Colors.blue[600],
-                                          ),
+                                          Icon(Icons.info_outline, size: 16, color: Colors.blue[600]),
                                           const SizedBox(width: 8),
                                           Expanded(
                                             child: Text(
@@ -319,7 +297,6 @@ class _SignUpPageState extends State<SignUpPage>
                                       ),
                                     ),
                                     const SizedBox(height: 28),
-
                                     // Sign Up Button
                                     Container(
                                       height: 56,
@@ -328,14 +305,11 @@ class _SignUpPageState extends State<SignUpPage>
                                         gradient: const LinearGradient(
                                           begin: Alignment.centerLeft,
                                           end: Alignment.centerRight,
-                                          colors: [
-                                            Color(0xFF74b9ff),
-                                            Color(0xFF6c5ce7),
-                                          ],
+                                          colors: [Color(0xFF74b9ff), Color(0xFF6c5ce7)],
                                         ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: const Color(0xFF74b9ff).withOpacity(0.4),
+                                            color: Color(0xFF74b9ff).withOpacity(0.4),
                                             blurRadius: 20,
                                             offset: const Offset(0, 10),
                                           ),
@@ -346,9 +320,7 @@ class _SignUpPageState extends State<SignUpPage>
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.transparent,
                                           shadowColor: Colors.transparent,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(16),
-                                          ),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                         ),
                                         child: _isLoading
                                             ? const SizedBox(
@@ -371,19 +343,13 @@ class _SignUpPageState extends State<SignUpPage>
                                       ),
                                     ),
                                     const SizedBox(height: 24),
-
-                                    // Terms and Privacy (Optional)
+                                    // Terms and Privacy
                                     Text(
                                       'By creating an account, you agree to our Terms of Service and Privacy Policy',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 12,
-                                        height: 1.4,
-                                      ),
+                                      style: TextStyle(color: Colors.grey[600], fontSize: 12, height: 1.4),
                                       textAlign: TextAlign.center,
                                     ),
                                     const SizedBox(height: 24),
-
                                     // Divider
                                     Row(
                                       children: [
@@ -392,17 +358,13 @@ class _SignUpPageState extends State<SignUpPage>
                                           padding: const EdgeInsets.symmetric(horizontal: 16),
                                           child: Text(
                                             'or',
-                                            style: TextStyle(
-                                              color: Colors.grey[600],
-                                              fontWeight: FontWeight.w500,
-                                            ),
+                                            style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w500),
                                           ),
                                         ),
                                         Expanded(child: Divider(color: Colors.grey[300])),
                                       ],
                                     ),
                                     const SizedBox(height: 24),
-
                                     // Sign In Link
                                     Container(
                                       padding: const EdgeInsets.all(16),
@@ -416,15 +378,10 @@ class _SignUpPageState extends State<SignUpPage>
                                         children: [
                                           Text(
                                             "Already have an account? ",
-                                            style: TextStyle(
-                                              color: Colors.grey[700],
-                                              fontWeight: FontWeight.w400,
-                                            ),
+                                            style: TextStyle(color: Colors.grey[700], fontWeight: FontWeight.w400),
                                           ),
                                           GestureDetector(
-                                            onTap: () {
-                                              Navigator.pop(context);
-                                            },
+                                            onTap: () => Navigator.pop(context),
                                             child: const Text(
                                               'Sign In',
                                               style: TextStyle(
@@ -468,23 +425,14 @@ class _SignUpPageState extends State<SignUpPage>
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
       ),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
         validator: validator,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-        ),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
@@ -495,11 +443,7 @@ class _SignUpPageState extends State<SignUpPage>
               color: const Color(0xFF74b9ff).withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
-              icon,
-              size: 20,
-              color: const Color(0xFF74b9ff),
-            ),
+            child: Icon(icon, size: 20, color: const Color(0xFF74b9ff)),
           ),
           suffixIcon: suffixIcon,
           filled: true,
@@ -525,14 +469,8 @@ class _SignUpPageState extends State<SignUpPage>
             borderSide: const BorderSide(color: Colors.red, width: 2),
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          labelStyle: TextStyle(
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
-          ),
-          hintStyle: TextStyle(
-            color: Colors.grey[400],
-            fontWeight: FontWeight.w400,
-          ),
+          labelStyle: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w500),
+          hintStyle: TextStyle(color: Colors.grey[400], fontWeight: FontWeight.w400),
         ),
       ),
     );
@@ -547,11 +485,19 @@ class _SignUpPageState extends State<SignUpPage>
 
     try {
       await _authService.registerWithEmailPassword(
-        _emailController.text.trim(),
-        _passwordController.text,
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        userType: 'patient', // Default to patient for signup
+        name: _nameController.text.trim(),
       );
 
       if (mounted) {
+        // Clear form fields after successful signup
+        _emailController.clear();
+        _passwordController.clear();
+        _confirmPasswordController.clear();
+        _nameController.clear();
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Row(
@@ -578,7 +524,7 @@ class _SignUpPageState extends State<SignUpPage>
               children: [
                 const Icon(Icons.error_outline, color: Colors.white),
                 const SizedBox(width: 12),
-                Expanded(child: Text(e.toString())),
+                Expanded(child: Text('Error: ${e.toString()}')),
               ],
             ),
             backgroundColor: Colors.red[600],
