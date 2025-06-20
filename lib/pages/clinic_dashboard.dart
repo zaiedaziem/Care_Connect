@@ -7,6 +7,7 @@ import 'profile_page.dart';
 import 'view_appointments.dart';
 import 'paid_appointments_page.dart';
 import 'UnpaidAppointmentsPage.dart';
+import 'doctor_appointments_screen.dart';
 
 void main() {
   runApp(const ClinicApp());
@@ -359,6 +360,25 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                         const SizedBox(width: 16),
 
                         _buildActionButton(
+                          icon: Icons.payment,
+                          label: 'Doctor\nAppointments',
+                          gradient: const [
+                            Color(0xFF10B981),
+                            Color(0xFF059669)
+                          ],
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const DoctorAppointmentsScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 16),
+
+                        _buildActionButton(
                           icon: Icons.calendar_today_outlined,
                           label: 'View\nAppointment',
                           gradient: const [
@@ -375,6 +395,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                             );
                           },
                         ),
+
                         // Empty spacer buttons to maintain layout
                         Expanded(child: Container()),
                         const SizedBox(width: 18),
