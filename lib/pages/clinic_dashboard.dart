@@ -293,34 +293,38 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                     // First row of action buttons
                     Row(
                       children: [
-                        _buildActionButton(
-                          icon: Icons.calendar_today_outlined,
-                          label: 'Create\nAppointment',
-                          gradient: const [
-                            Color(0xFF667eea),
-                            Color(0xFF764ba2)
-                          ],
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const HospitalListScreen(),
-                              ),
-                            );
-                          },
+                        Expanded(
+                          child: _buildActionButton(
+                            icon: Icons.calendar_today_outlined,
+                            label: 'Create\nAppointment',
+                            gradient: const [
+                              Color(0xFF667eea),
+                              Color(0xFF764ba2)
+                            ],
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const HospitalListScreen(),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                         const SizedBox(width: 16),
-                        _buildActionButton(
-                          icon: Icons.favorite_outline,
-                          label: 'Health\nTips',
-                          gradient: const [
-                            Color(0xFFFF6B6B),
-                            Color(0xFFFF8E8E)
-                          ],
-                          onTap: () {
-                            // Add health tips navigation
-                          },
+                        Expanded(
+                          child: _buildActionButton(
+                            icon: Icons.favorite_outline,
+                            label: 'Health\nTips',
+                            gradient: const [
+                              Color(0xFFFF6B6B),
+                              Color(0xFFFF8E8E)
+                            ],
+                            onTap: () {
+                              // Add health tips navigation
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -328,54 +332,58 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                     // Second row of action buttons
                     Row(
                       children: [
-                        _buildActionButton(
-                          icon: Icons.medical_services_outlined,
-                          label: 'Emergency\nContacts',
-                          gradient: const [
-                            Color(0xFF4ECDC4),
-                            Color(0xFF44A08D)
-                          ],
-                          onTap: () {
-                            // Add emergency contacts navigation
-                          },
+                        Expanded(
+                          child: _buildActionButton(
+                            icon: Icons.medical_services_outlined,
+                            label: 'Emergency\nContacts',
+                            gradient: const [
+                              Color(0xFF4ECDC4),
+                              Color(0xFF44A08D)
+                            ],
+                            onTap: () {
+                              // Add emergency contacts navigation
+                            },
+                          ),
                         ),
                         const SizedBox(width: 16),
-
-                        _buildActionButton(
-                          icon: Icons.payment,
-                          label: 'Paid\nAppointments',
-                          gradient: const [
-                            Color(0xFF10B981),
-                            Color(0xFF059669)
-                          ],
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const PaidAppointmentsPage(),
-                              ),
-                            );
-                          },
+                        Expanded(
+                          child: _buildActionButton(
+                            icon: Icons.payment,
+                            label: 'Paid\nAppointments',
+                            gradient: const [
+                              Color(0xFF10B981),
+                              Color(0xFF059669)
+                            ],
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const PaidAppointmentsPage(),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                         const SizedBox(width: 16),
-
-                        _buildActionButton(
-                          icon: Icons.payment,
-                          label: 'Doctor\nAppointments',
-                          gradient: const [
-                            Color(0xFF10B981),
-                            Color(0xFF059669)
-                          ],
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const DoctorAppointmentsScreen(),
-                              ),
-                            );
-                          },
+                        Expanded(
+                          child: _buildActionButton(
+                            icon: Icons.calendar_today_outlined,
+                            label: 'View\nAppointment',
+                            gradient: const [
+                              Color(0xFF4ECDC4),
+                              Color(0xFF44A08D)
+                            ],
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ViewAppointmentsScreen(),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                         const SizedBox(width: 16),
 
