@@ -1,14 +1,16 @@
+// main.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'pages/login_page.dart';
 import 'pages/clinic_dashboard.dart';
-import 'pages/doctor_dashboard.dart'; // Add this import
-import 'pages/paid_appointments_page.dart';
+import 'pages/doctor_dashboard.dart';
+import 'pages/admin_dashboard.dart';
 import 'services/auth_service.dart';
-import 'models/user_profile.dart'; // Add this import
+import 'services/doctor_service.dart';
+import 'models/user_profile.dart';
+import 'models/doctor.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -16,12 +18,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  // Enable offline persistence for Firestore
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: true,
   );
-
   runApp(const MyApp());
 }
 
@@ -52,49 +51,30 @@ class AuthWrapper extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: authService.authStateChanges,
       builder: (context, snapshot) {
-        // Loading state
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
-
-        // Error state
         if (snapshot.hasError) {
           return Scaffold(
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: Colors.red,
-                  ),
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
                   const SizedBox(height: 16),
-                  Text(
-                    'Authentication Error',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                  Text('Authentication Error', style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 8),
-                  Text(
-                    'Please restart the app',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                  Text('Please restart the app', style: Theme.of(context).textTheme.bodyMedium),
                 ],
               ),
             ),
           );
         }
-
-        // User is logged in - check user type and route accordingly
         if (snapshot.hasData && snapshot.data != null) {
           return UserTypeRouter(user: snapshot.data!);
         }
-
-        // User is not logged in
         return const LoginPage();
       },
     );
@@ -109,11 +89,11 @@ class UserTypeRouter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthService authService = AuthService();
+    final DoctorService doctorService = DoctorService();
 
-    return FutureBuilder<UserProfile?>(
-      future: authService.getUserProfile(user.uid),
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _fetchUserType(user.uid, authService, doctorService),
       builder: (context, snapshot) {
-        // Loading state while fetching user profile
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             body: Container(
@@ -135,11 +115,7 @@ class UserTypeRouter extends StatelessWidget {
                     SizedBox(height: 20),
                     Text(
                       'Loading your dashboard...',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -148,75 +124,24 @@ class UserTypeRouter extends StatelessWidget {
           );
         }
 
-        // Error state
-        if (snapshot.hasError) {
+        if (snapshot.hasError || !snapshot.hasData) {
           return Scaffold(
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: Colors.red,
-                  ),
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
                   const SizedBox(height: 16),
-                  Text(
-                    'Profile Loading Error',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                  Text('Profile Loading Error', style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 8),
-                  Text(
-                    'Failed to load user profile',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Force rebuild by creating a new widget
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => const AuthWrapper(),
-                        ),
-                      );
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-
-        // Route user based on their userType
-        final userProfile = snapshot.data;
-        
-        if (userProfile == null) {
-          // Handle case where user profile doesn't exist
-          return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.person_off_outlined,
-                    size: 64,
-                    color: Colors.orange,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Profile Not Found',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Please contact support',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                  Text('Failed to load user profile', style: Theme.of(context).textTheme.bodyMedium),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () async {
                       await authService.signOut();
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => const AuthWrapper()),
+                      );
                     },
                     child: const Text('Sign Out'),
                   ),
@@ -226,37 +151,28 @@ class UserTypeRouter extends StatelessWidget {
           );
         }
 
-        // Route based on user type
-        switch (userProfile.userType.toLowerCase()) {
+        final data = snapshot.data!;
+        final String userType = data['userType'];
+        final dynamic profile = data['profile'];
+
+        switch (userType) {
           case 'patient':
             return const ClinicDashboard();
+          case 'admin':
+            return const AdminDashboard();
           case 'doctor':
             return const DoctorDashboard();
-          case 'admin':
-            // You can add admin dashboard later
-            return const ClinicDashboard(); // Fallback to clinic dashboard for now
           default:
-            // Handle unknown user types
             return Scaffold(
               body: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.help_outline,
-                      size: 64,
-                      color: Colors.amber,
-                    ),
+                    const Icon(Icons.help_outline, size: 64, color: Colors.amber),
                     const SizedBox(height: 16),
-                    Text(
-                      'Unknown User Type',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
+                    Text('Unknown User Type', style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 8),
-                    Text(
-                      'User type: ${userProfile.userType}',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+                    Text('User type: $userType', style: Theme.of(context).textTheme.bodyMedium),
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () async {
@@ -271,5 +187,35 @@ class UserTypeRouter extends StatelessWidget {
         }
       },
     );
+  }
+
+  Future<Map<String, dynamic>> _fetchUserType(
+    String uid,
+    AuthService authService,
+    DoctorService doctorService,
+  ) async {
+    try {
+      // Check users collection first
+      final userProfile = await authService.getUserProfile(uid);
+      if (userProfile != null) {
+        return {
+          'userType': userProfile.userType.toLowerCase(),
+          'profile': userProfile,
+        };
+      }
+
+      // If no user profile, check doctors collection
+      final doctor = await doctorService.getDoctorByUserId(uid);
+      if (doctor != null) {
+        return {
+          'userType': 'doctor',
+          'profile': doctor,
+        };
+      }
+
+      throw Exception('No profile found in users or doctors collection');
+    } catch (e) {
+      throw Exception('Error fetching user type: $e');
+    }
   }
 }

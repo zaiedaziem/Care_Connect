@@ -74,7 +74,7 @@ class PaidAppointmentsPage extends StatelessWidget {
                     '${data['doctorName'] ?? 'Doctor'} at ${data['hospitalName'] ?? 'Clinic'}',
                   ),
                   subtitle: Text(
-                    'Paid: \RM${(data['amount'] as num?)?.toStringAsFixed(2) ?? '0.00'}',
+                    'Paid: RM${(data['amount'] as num?)?.toStringAsFixed(2) ?? '0.00'}',
                   ),
                   trailing: Text(data['date']?.toString() ?? ''),
                 ),

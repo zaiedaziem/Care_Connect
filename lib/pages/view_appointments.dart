@@ -241,7 +241,7 @@ class _ViewAppointmentsScreenState extends State<ViewAppointmentsScreen> {
             ),
             const SizedBox(height: 8.0),
             Text(
-              '${appointment.doctorName}',
+              appointment.doctorName,
               style: const TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.w500,
