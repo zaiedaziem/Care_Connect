@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:qq/pages/clinic_location.dart';
 import 'createAppointment.dart';
 import 'profile_page.dart';
 import 'view_appointments.dart';
@@ -395,6 +396,26 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                             );
                           },
                         ),
+                        const SizedBox(width: 16),
+
+                        _buildActionButton(
+                          icon: Icons.location_on,
+                          label: 'Clinic\nLocation',
+                          gradient: const [
+                            Color(0xFF10B981),
+                            Color(0xFF059669)
+                          ],
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const ClinicLocationsPage(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 16),
 
                         // Empty spacer buttons to maintain layout
                         Expanded(child: Container()),

@@ -12,6 +12,8 @@ import 'services/doctor_service.dart';
 import 'models/user_profile.dart';
 import 'models/doctor.dart';
 import 'firebase_options.dart';
+import 'package:geolocator/geolocator.dart';
+import 'services/location_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +23,10 @@ void main() async {
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: true,
   );
+
+  final locationService = LocationService();
+  await locationService.checkAndRequestPermissions();
+
   runApp(const MyApp());
 }
 
@@ -64,9 +70,11 @@ class AuthWrapper extends StatelessWidget {
                 children: [
                   const Icon(Icons.error_outline, size: 64, color: Colors.red),
                   const SizedBox(height: 16),
-                  Text('Authentication Error', style: Theme.of(context).textTheme.titleLarge),
+                  Text('Authentication Error',
+                      style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 8),
-                  Text('Please restart the app', style: Theme.of(context).textTheme.bodyMedium),
+                  Text('Please restart the app',
+                      style: Theme.of(context).textTheme.bodyMedium),
                 ],
               ),
             ),
@@ -115,7 +123,10 @@ class UserTypeRouter extends StatelessWidget {
                     SizedBox(height: 20),
                     Text(
                       'Loading your dashboard...',
-                      style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -132,15 +143,18 @@ class UserTypeRouter extends StatelessWidget {
                 children: [
                   const Icon(Icons.error_outline, size: 64, color: Colors.red),
                   const SizedBox(height: 16),
-                  Text('Profile Loading Error', style: Theme.of(context).textTheme.titleLarge),
+                  Text('Profile Loading Error',
+                      style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 8),
-                  Text('Failed to load user profile', style: Theme.of(context).textTheme.bodyMedium),
+                  Text('Failed to load user profile',
+                      style: Theme.of(context).textTheme.bodyMedium),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () async {
                       await authService.signOut();
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => const AuthWrapper()),
+                        MaterialPageRoute(
+                            builder: (context) => const AuthWrapper()),
                       );
                     },
                     child: const Text('Sign Out'),
@@ -168,11 +182,14 @@ class UserTypeRouter extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.help_outline, size: 64, color: Colors.amber),
+                    const Icon(Icons.help_outline,
+                        size: 64, color: Colors.amber),
                     const SizedBox(height: 16),
-                    Text('Unknown User Type', style: Theme.of(context).textTheme.titleLarge),
+                    Text('Unknown User Type',
+                        style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 8),
-                    Text('User type: $userType', style: Theme.of(context).textTheme.bodyMedium),
+                    Text('User type: $userType',
+                        style: Theme.of(context).textTheme.bodyMedium),
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () async {
