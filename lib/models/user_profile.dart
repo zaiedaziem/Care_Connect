@@ -4,7 +4,7 @@ class UserProfile {
   final String? name;
   final String? contact;
   final String? profilePictureUrl;
-  final String userType; // Made required and not nullable
+  final String userType; // Made required and not nullable "doctor, patient, admin"
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
