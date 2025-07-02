@@ -26,13 +26,11 @@ class MyHomePage extends StatefulWidget {
   //muzaking
   //tryuasuconasciu
   //tegar
-  //nyotnyot
   //pak atong
   //jisanbiucna
   //bla
 
-  final String title;
-
+final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
