@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/appointment_model.dart';
+import '../services/email_service.dart';
 
 class AppointmentService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -275,7 +276,8 @@ class AppointmentService {
   }
 
   /// Updates appointment status specifically
-  Future<void> updateAppointmentStatus(String appointmentId, String newStatus) async {
+  Future<void> updateAppointmentStatus(
+      String appointmentId, String newStatus) async {
     try {
       Map<String, dynamic> updates = {
         'status': newStatus,
@@ -285,6 +287,29 @@ class AppointmentService {
       if (newStatus.toLowerCase() == 'confirmed') {
         // You might want to keep existing payment status
         // updates['isPaid'] = true; // Uncomment if you want to auto-mark as paid
+      }
+
+      if (newStatus == 'confirmed') {
+        final doc = await _firestore
+            .collection('appointments')
+            .doc(appointmentId)
+            .get();
+        if (doc.exists) {
+          final data = doc.data() as Map<String, dynamic>;
+          final appointment = Appointment.fromMap({
+            ...data,
+            'id': doc.id,
+          });
+
+          await EmailService.sendAppointmentConfirmedEmail(
+            toEmail: appointment.patientEmail,
+            toName: appointment.patientName,
+            appointmentDate: appointment.date,
+            appointmentTime: appointment.time,
+            doctorName: appointment.doctorName,
+            hospitalName: appointment.hospitalName,
+          );
+        }
       }
 
       await updateAppointment(
@@ -341,15 +366,16 @@ class AppointmentService {
   }
 
   /// Batch update multiple appointments
-  Future<void> batchUpdateAppointments(List<String> appointmentIds, Map<String, dynamic> updates) async {
+  Future<void> batchUpdateAppointments(
+      List<String> appointmentIds, Map<String, dynamic> updates) async {
     try {
       final batch = _firestore.batch();
-      
+
       for (String appointmentId in appointmentIds) {
         final docRef = _firestore.collection('appointments').doc(appointmentId);
         batch.update(docRef, updates);
       }
-      
+
       await batch.commit();
     } catch (e) {
       throw Exception('Failed to batch update appointments: ${e.toString()}');
@@ -361,7 +387,8 @@ class AppointmentService {
     try {
       await updateAppointmentStatus(appointmentId, 'completed');
     } catch (e) {
-      throw Exception('Failed to mark appointment as completed: ${e.toString()}');
+      throw Exception(
+          'Failed to mark appointment as completed: ${e.toString()}');
     }
   }
 
@@ -369,7 +396,7 @@ class AppointmentService {
   Future<Map<String, int>> getAppointmentStatistics() async {
     try {
       final snapshot = await _firestore.collection('appointments').get();
-      
+
       Map<String, int> stats = {
         'total': 0,
         'confirmed': 0,
@@ -383,10 +410,10 @@ class AppointmentService {
       for (var doc in snapshot.docs) {
         final data = doc.data();
         stats['total'] = stats['total']! + 1;
-        
+
         final status = (data['status'] as String).toLowerCase();
         stats[status] = (stats[status] ?? 0) + 1;
-        
+
         if (data['isPaid'] == true) {
           stats['paid'] = stats['paid']! + 1;
         } else {
@@ -399,5 +426,4 @@ class AppointmentService {
       throw Exception('Failed to get appointment statistics: ${e.toString()}');
     }
   }
-
 }

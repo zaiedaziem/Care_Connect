@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'doctor_list.dart';
 import 'create_doctor.dart';
 import '../services/auth_service.dart'; // Import AuthService
+import 'doctor_appointments_screen.dart'; // <-- Add this import
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
@@ -41,6 +42,18 @@ class AdminDashboard extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => DoctorListPage(),
+                  ),
+                );
+              },
+            ),
+            _DashboardCard(
+              title: 'Appointments',
+              icon: Icons.calendar_today,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DoctorAppointmentsScreen(),
                   ),
                 );
               },
@@ -93,7 +106,9 @@ class _DashboardCard extends StatelessWidget {
               Icon(
                 icon,
                 size: 48,
-                color: title == 'Logout' ? Colors.red : Theme.of(context).primaryColor, // Red for logout
+                color: title == 'Logout'
+                    ? Colors.red
+                    : Theme.of(context).primaryColor, // Red for logout
               ),
               const SizedBox(height: 8),
               Text(

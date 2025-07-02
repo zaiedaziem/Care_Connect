@@ -1,1 +1,41 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"careconnect-1601c","appId":"1:707193746787:android:87b8b5355154d60fe88f56","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"careconnect-1601c","configurations":{"android":"1:707193746787:android:87b8b5355154d60fe88f56","ios":"1:707193746787:ios:1b0b877352841ef8e88f56","macos":"1:707193746787:ios:1b0b877352841ef8e88f56","web":"1:707193746787:web:f58c7e2ee87c5993e88f56","windows":"1:707193746787:web:d69be0236feeba99e88f56"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "careconnect-1601c",
+          "appId": "1:707193746787:android:87b8b5355154d60fe88f56",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "careconnect-1601c",
+          "configurations": {
+            "android": "1:707193746787:android:87b8b5355154d60fe88f56",
+            "ios": "1:707193746787:ios:1b0b877352841ef8e88f56",
+            "macos": "1:707193746787:ios:1b0b877352841ef8e88f56",
+            "web": "1:707193746787:web:f58c7e2ee87c5993e88f56",
+            "windows": "1:707193746787:web:d69be0236feeba99e88f56"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix functions run lint"
+      ]
+    }
+  ]
+}
