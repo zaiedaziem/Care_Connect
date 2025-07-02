@@ -24,20 +24,6 @@ class DoctorDashboard extends StatelessWidget {
           mainAxisSpacing: 16,
           children: [
             _DashboardCard(
-              title: 'Appointments',
-              icon: Icons.calendar_today,
-              color: Colors.blue,
-              count: 'Manage',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DoctorAppointmentsScreen(),
-                  ),
-                );
-              },
-            ),
-            _DashboardCard(
               title: 'Patients',
               icon: Icons.people,
               color: Colors.green,
@@ -55,7 +41,8 @@ class DoctorDashboard extends StatelessWidget {
               count: 'Create',
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Prescriptions page - Coming Soon!')),
+                  const SnackBar(
+                      content: Text('Prescriptions page - Coming Soon!')),
                 );
               },
             ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'doctor_list.dart';
 import 'create_doctor.dart';
-import '../services/auth_service.dart';
+import '../services/auth_service.dart'; // Import AuthService
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -37,270 +37,43 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text(
-          'Admin Dashboard',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 24,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFF667eea),
-                Color(0xFF764ba2),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
-        foregroundColor: Colors.white,
+        title: const Text('Admin Dashboard'),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Welcome Section
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFF667eea),
-                      Color(0xFF764ba2),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          children: [
+            _DashboardCard(
+              title: 'Register Doctor',
+              icon: Icons.person_add,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DoctorSignUpPage(),
                   ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome Back!',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Manage your healthcare system efficiently',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 30),
-              
-              // Quick Actions Title
-              const Text(
-                'Quick Actions',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2c3e50),
-                ),
-              ),
-              
-              const SizedBox(height: 20),
-              
-              // Dashboard Cards
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1.1,
-                children: [
-                  _DashboardCard(
-                    title: 'Register Doctor',
-                    subtitle: 'Add new doctors',
-                    icon: Icons.person_add_alt_1,
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF43e97b), Color(0xFF38f9d7)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DoctorSignUpPage(),
-                        ),
-                      );
-                    },
-                  ),
-                  _DashboardCard(
-                    title: 'Doctor List',
-                    subtitle: 'View all doctors',
-                    icon: Icons.medical_services,
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DoctorListPage(),
-                        ),
-                      );
-                    },
-                  ),
-                  _DashboardCard(
-                    title: 'Analytics',
-                    subtitle: 'View reports',
-                    icon: Icons.analytics,
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFfa709a), Color(0xFFfee140)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    onTap: () {
-                      // Add analytics navigation here
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Analytics feature coming soon!'),
-                          backgroundColor: Colors.orange,
-                        ),
-                      );
-                    },
-                  ),
-                  _DashboardCard(
-                    title: 'Logout',
-                    subtitle: 'Sign out safely',
-                    icon: Icons.logout,
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFff6b6b), Color(0xFFffa500)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    onTap: () async {
-                      _showLogoutDialog(context, authService);
-                    },
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 30),
-              
-              // Statistics Cards
-              const Text(
-                'System Overview',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2c3e50),
-                ),
-              ),
-              
-              const SizedBox(height: 20),
-              
-              Row(
-                children: [
-                  Expanded(
-                    child: StreamBuilder<int>(
-                      stream: getDoctorCount(),
-                      builder: (context, snapshot) {
-                        String doctorCount = '0';
-                        if (snapshot.hasData) {
-                          doctorCount = snapshot.data.toString();
-                        } else if (snapshot.hasError) {
-                          doctorCount = 'Error';
-                        }
-                        
-                        return _StatCard(
-                          title: 'Total Doctors',
-                          value: doctorCount,
-                          icon: Icons.local_hospital,
-                          color: const Color(0xFF43e97b),
-                          isLoading: snapshot.connectionState == ConnectionState.waiting,
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: StreamBuilder<int>(
-                      stream: FirebaseFirestore.instance
-                          .collection('doctors')
-                          .where('status', isEqualTo: 'Active')
-                          .snapshots()
-                          .map((snapshot) => snapshot.docs.length),
-                      builder: (context, snapshot) {
-                        String activeCount = '0';
-                        if (snapshot.hasData) {
-                          activeCount = snapshot.data.toString();
-                        } else if (snapshot.hasError) {
-                          activeCount = 'Error';
-                        }
-                        
-                        return _StatCard(
-                          title: 'Active Doctors',
-                          value: activeCount,
-                          icon: Icons.people,
-                          color: const Color(0xFF667eea),
-                          isLoading: snapshot.connectionState == ConnectionState.waiting,
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context, AuthService authService) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.logout, color: Colors.red),
-              SizedBox(width: 8),
-              Text('Logout'),
-            ],
-          ),
-          content: const Text('Are you sure you want to logout?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+                );
+              },
             ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
+            _DashboardCard(
+              title: 'Doctor List',
+              icon: Icons.list,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DoctorListPage(),
+                  ),
+                );
+              },
+            ),
+            _DashboardCard(
+              title: 'Logout',
+              icon: Icons.logout,
+              onTap: () async {
                 try {
                   await authService.signOut();
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -491,38 +264,17 @@ class _StatCard extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: color,
-                size: 28,
+                size: 48,
+                color: title == 'Logout' ? Colors.red : Theme.of(context).primaryColor, // Red for logout
               ),
-              isLoading
-                  ? SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(color),
-                      ),
-                    )
-                  : Text(
-                      value,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: color,
-                      ),
-                    ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: const TextStyle(fontSize: 16),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.grey,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
