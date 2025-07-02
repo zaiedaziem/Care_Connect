@@ -276,50 +276,65 @@ class AppointmentService {
   }
 
   /// Updates appointment status specifically
-  Future<void> updateAppointmentStatus(
-      String appointmentId, String newStatus) async {
-    try {
-      Map<String, dynamic> updates = {
-        'status': newStatus,
-      };
+Future<void> updateAppointmentStatus(
+    String appointmentId, String newStatus) async {
+  try {
+    Map<String, dynamic> updates = {
+      'status': newStatus,
+    };
 
-      // If confirming an appointment, also update payment status if needed
-      if (newStatus.toLowerCase() == 'confirmed') {
-        // You might want to keep existing payment status
-        // updates['isPaid'] = true; // Uncomment if you want to auto-mark as paid
-      }
-
-      if (newStatus == 'confirmed') {
-        final doc = await _firestore
-            .collection('appointments')
-            .doc(appointmentId)
-            .get();
-        if (doc.exists) {
-          final data = doc.data() as Map<String, dynamic>;
-          final appointment = Appointment.fromMap({
-            ...data,
-            'id': doc.id,
-          });
-
-          await EmailService.sendAppointmentConfirmedEmail(
-            toEmail: appointment.patientEmail,
-            toName: appointment.patientName,
-            appointmentDate: appointment.date,
-            appointmentTime: appointment.time,
-            doctorName: appointment.doctorName,
-            hospitalName: appointment.hospitalName,
-          );
-        }
-      }
-
-      await updateAppointment(
-        appointmentId: appointmentId,
-        updates: updates,
-      );
-    } catch (e) {
-      throw Exception('Failed to update appointment status: ${e.toString()}');
+    // If confirming an appointment, also update payment status if needed
+    if (newStatus.toLowerCase() == 'confirmed') {
+      // You might want to keep existing payment status
+      // updates['isPaid'] = true; // Uncomment if you want to auto-mark as paid
     }
+
+    // Get appointment data for email notifications
+    final doc = await _firestore
+        .collection('appointments')
+        .doc(appointmentId)
+        .get();
+    
+    if (doc.exists) {
+      final data = doc.data() as Map<String, dynamic>;
+      final appointment = Appointment.fromMap({
+        ...data,
+        'id': doc.id,
+      });
+
+      // Send email for confirmed appointments
+      if (newStatus.toLowerCase() == 'confirmed') {
+        await EmailService.sendAppointmentConfirmedEmail(
+          toEmail: appointment.patientEmail,
+          toName: appointment.patientName,
+          appointmentDate: appointment.date,
+          appointmentTime: appointment.time,
+          doctorName: appointment.doctorName,
+          hospitalName: appointment.hospitalName,
+        );
+      }
+      
+      // Send email for cancelled appointments
+      else if (newStatus.toLowerCase() == 'cancelled') {
+        await EmailService.sendAppointmentCancelledEmail(
+          toEmail: appointment.patientEmail,
+          toName: appointment.patientName,
+          appointmentDate: appointment.date,
+          appointmentTime: appointment.time,
+          doctorName: appointment.doctorName,
+          hospitalName: appointment.hospitalName,
+        );
+      }
+    }
+
+    await updateAppointment(
+      appointmentId: appointmentId,
+      updates: updates,
+    );
+  } catch (e) {
+    throw Exception('Failed to update appointment status: ${e.toString()}');
   }
+}
 
   /// Stream all appointments for real-time updates (for doctor dashboard)
   Stream<List<Appointment>> streamAllAppointments({
