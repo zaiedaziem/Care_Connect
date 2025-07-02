@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../services/AppointmentService.dart';
+import '../services/appointment_service.dart';
 import '../models/appointment_model.dart';
 
 class DoctorAppointmentsScreen extends StatefulWidget {
   const DoctorAppointmentsScreen({super.key});
 
   @override
-  _DoctorAppointmentsScreenState createState() => _DoctorAppointmentsScreenState();
+  _DoctorAppointmentsScreenState createState() =>
+      _DoctorAppointmentsScreenState();
 }
 
 class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
@@ -34,9 +35,11 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
     });
   }
 
-  Future<void> _updateAppointmentStatus(String appointmentId, String newStatus) async {
+  Future<void> _updateAppointmentStatus(
+      String appointmentId, String newStatus) async {
     try {
-      await _appointmentService.updateAppointmentStatus(appointmentId, newStatus);
+      await _appointmentService.updateAppointmentStatus(
+          appointmentId, newStatus);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Appointment status updated to $newStatus')),
       );
@@ -128,7 +131,8 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
         children: [
           // Status Filter Dropdown
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: DropdownButtonFormField<String>(
               value: _selectedFilter,
               decoration: InputDecoration(
@@ -169,7 +173,8 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                          const Icon(Icons.error_outline,
+                              size: 64, color: Colors.red),
                           const SizedBox(height: 16),
                           Text('Error: ${snapshot.error}'),
                           const SizedBox(height: 16),
@@ -189,7 +194,8 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.calendar_today, size: 64, color: Colors.grey),
+                          Icon(Icons.calendar_today,
+                              size: 64, color: Colors.grey),
                           SizedBox(height: 16),
                           Text(
                             'No appointments found',
@@ -268,7 +274,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             ),
             const SizedBox(height: 12.0),
             Text(
-              'Dr. ${appointment.doctorName}',
+              '${appointment.doctorName}',
               style: const TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.w500,
@@ -278,7 +284,8 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             const SizedBox(height: 16.0),
             Row(
               children: [
-                const Icon(Icons.calendar_today, size: 16.0, color: Colors.grey),
+                const Icon(Icons.calendar_today,
+                    size: 16.0, color: Colors.grey),
                 const SizedBox(width: 8.0),
                 Text(appointment.date),
                 const SizedBox(width: 16.0),
@@ -355,7 +362,8 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                   child: ElevatedButton.icon(
                     onPressed: appointment.status.toLowerCase() == 'confirmed'
                         ? null
-                        : () => _updateAppointmentStatus(appointment.id!, 'confirmed'),
+                        : () => _updateAppointmentStatus(
+                            appointment.id!, 'confirmed'),
                     icon: const Icon(Icons.check_circle_outline),
                     label: const Text('Confirm'),
                     style: ElevatedButton.styleFrom(
@@ -370,7 +378,8 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                   child: ElevatedButton.icon(
                     onPressed: appointment.status.toLowerCase() == 'cancelled'
                         ? null
-                        : () => _updateAppointmentStatus(appointment.id!, 'cancelled'),
+                        : () => _updateAppointmentStatus(
+                            appointment.id!, 'cancelled'),
                     icon: const Icon(Icons.cancel_outlined),
                     label: const Text('Cancel'),
                     style: ElevatedButton.styleFrom(
