@@ -387,43 +387,24 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                         ),
                         const SizedBox(width: 16),
 
-                        _buildActionButton(
-                          icon: Icons.calendar_today_outlined,
-                          label: 'View\nAppointment',
-                          gradient: const [
-                            Color(0xFF4ECDC4),
-                            Color(0xFF44A08D)
-                          ],
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const ViewAppointmentsScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 16),
-
-                        _buildActionButton(
-                          icon: Icons.location_on,
-                          label: 'Clinic\nLocation',
-                          gradient: const [
-                            Color(0xFF10B981),
-                            Color(0xFF059669)
-                          ],
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const ClinicLocationsPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 16),
+                        // _buildActionButton(
+                        //   icon: Icons.location_on,
+                        //   label: 'Clinic\nLocation',
+                        //   gradient: const [
+                        //     Color(0xFF10B981),
+                        //     Color(0xFF059669)
+                        //   ],
+                        //   onTap: () {
+                        //     Navigator.push(
+                        //       context,
+                        //       MaterialPageRoute(
+                        //         builder: (context) =>
+                        //             const ClinicLocationsPage(),
+                        //       ),
+                        //     );
+                        //   },
+                        // ),
+                        // const SizedBox(width: 16),
 
                         // Empty spacer buttons to maintain layout
                         Expanded(child: Container()),
