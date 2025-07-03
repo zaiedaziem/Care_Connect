@@ -1,160 +1,22 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/appointment_service.dart';
+import '../services/doctor_service.dart';
 import '../models/appointment_model.dart';
-import 'payment_screen.dart';
-import '../models/hospital.dart';
 import '../models/doctor.dart';
+import 'payment_screen.dart';
 
-// Hospital List Screen (Page 1)
-class HospitalListScreen extends StatelessWidget {
-  const HospitalListScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Malaysia Hospitals'),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
-          itemCount: hospitals.length,
-          itemBuilder: (context, index) {
-            final hospital = hospitals[index];
-            return HospitalCard(hospital: hospital);
-          },
-        ),
-      ),
-    );
-  }
-}
-
-// Hospital Card Widget for the List
-class HospitalCard extends StatelessWidget {
-  final Hospital hospital;
-
-  const HospitalCard({super.key, required this.hospital});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16.0),
-      elevation: 4.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  HospitalBookingScreen(hospitalId: hospital.id),
-            ),
-          );
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(12.0)),
-              child: Image.asset(
-                hospital.imageUrl,
-                height: 180,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 180,
-                    color: Colors.grey[300],
-                    child: Center(
-                      child: Icon(Icons.local_hospital,
-                          size: 80, color: Colors.grey[500]),
-                    ),
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    hospital.name,
-                    style: const TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on,
-                          size: 16.0, color: Colors.blue),
-                      const SizedBox(width: 4.0),
-                      Text(
-                        hospital.location,
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16.0),
-                  Text(
-                    '${hospital.doctors.length} Doctors Available',
-                    style: const TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.blue,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 16.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              HospitalBookingScreen(hospitalId: hospital.id),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                    child: const Text('Book Appointment'),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Enhanced Hospital Booking Screen with Edit Functionality
 class HospitalBookingScreen extends StatefulWidget {
-  final int hospitalId;
   final Appointment? appointmentToEdit;
+  final String? hospitalName;
 
   const HospitalBookingScreen({
     super.key,
-    required this.hospitalId,
     this.appointmentToEdit,
+    this.hospitalName,
   });
 
   @override
@@ -162,8 +24,10 @@ class HospitalBookingScreen extends StatefulWidget {
 }
 
 class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
-  late Hospital hospital;
   Doctor? selectedDoctor;
+  List<Doctor> availableDoctors = [];
+  bool isLoadingDoctors = true;
+
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -174,29 +38,74 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
   bool _isEditing = false;
 
   final AppointmentService _appointmentService = AppointmentService();
+  final DoctorService _doctorService = DoctorService();
 
   @override
   void initState() {
     super.initState();
-    hospital = hospitals.firstWhere((h) => h.id == widget.hospitalId);
     _isEditing = widget.appointmentToEdit != null;
+    _loadDoctors();
+    _initializeForm();
+  }
 
-    // Pre-fill user data if available
+  Future<void> _loadDoctors() async {
+    try {
+      setState(() {
+        isLoadingDoctors = true;
+      });
+
+      List<Doctor> doctors;
+
+      if (widget.hospitalName != null) {
+        doctors = await _doctorService.getDoctorsByClinic(widget.hospitalName!);
+      } else {
+        final snapshot = await _doctorService.getActiveDoctorsStream().first;
+        doctors = snapshot;
+      }
+
+      setState(() {
+        availableDoctors = doctors;
+        isLoadingDoctors = false;
+      });
+
+      if (_isEditing && widget.appointmentToEdit != null) {
+        final existingDoctorName = widget.appointmentToEdit!.doctorName;
+        selectedDoctor = availableDoctors.firstWhere(
+          (doctor) => doctor.fullName == existingDoctorName,
+          orElse: () => availableDoctors.first,
+        );
+        if (selectedDoctor == null && availableDoctors.isNotEmpty) {
+          selectedDoctor = availableDoctors.first;
+        }
+        setState(() {});
+      }
+    } catch (e) {
+      setState(() {
+        isLoadingDoctors = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to load doctors: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _initializeForm() {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       emailController.text = user.email ?? '';
       nameController.text = user.displayName ?? '';
     }
 
-    // If editing, pre-fill the form with existing appointment data
-    if (_isEditing) {
+    if (_isEditing && widget.appointmentToEdit != null) {
       final appointment = widget.appointmentToEdit!;
       nameController.text = appointment.patientName;
       emailController.text = appointment.patientEmail;
       phoneController.text = appointment.patientPhone;
       notesController.text = appointment.notes;
 
-      // Parse the date (assuming format is dd/mm/yyyy)
       final dateParts = appointment.date.split('/');
       if (dateParts.length == 3) {
         selectedDate = DateTime(
@@ -206,7 +115,6 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
         );
       }
 
-      // Parse the time (assuming format is like "9:00 AM")
       final timeParts = appointment.time.split(' ');
       if (timeParts.length == 2) {
         final time = timeParts[0].split(':');
@@ -218,12 +126,6 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
           selectedTime = TimeOfDay(hour: hour, minute: int.parse(time[1]));
         }
       }
-
-      // Select the doctor
-      selectedDoctor = hospital.doctors.firstWhere(
-        (d) => d.fullName == appointment.doctorName,
-        orElse: () => hospital.doctors.first,
-      );
     }
   }
 
@@ -276,7 +178,6 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
         return;
       }
 
-      // Show loading dialog
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -299,7 +200,7 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
         Appointment appointment = Appointment(
           id: _isEditing ? widget.appointmentToEdit!.id : null,
           doctorName: selectedDoctor!.fullName,
-          hospitalName: hospital.name,
+          hospitalName: selectedDoctor!.clinic,
           time: selectedTime.format(context),
           date:
               '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
@@ -316,11 +217,11 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
         );
 
         if (_isEditing) {
-          // Update existing appointment
           await _appointmentService.updateAppointment(
             appointmentId: appointment.id!,
             updates: {
               'doctorName': appointment.doctorName,
+              'hospitalName': appointment.hospitalName,
               'time': appointment.time,
               'date': appointment.date,
               'patientName': appointment.patientName,
@@ -330,18 +231,15 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
             },
           );
 
-          Navigator.of(context).pop(); // Close loading dialog
-          Navigator.of(context).pop(); // Go back to previous screen
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Appointment updated successfully')),
           );
         } else {
-          // Create new appointment
           String appointmentId =
               await _appointmentService.bookAppointment(appointment);
-          Navigator.of(context).pop(); // Close loading dialog
-
-          // Show confirmation dialog with payment options
+          Navigator.of(context).pop();
           _showBookingConfirmation(context, appointmentId);
         }
       } catch (e) {
@@ -370,7 +268,8 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Your appointment at ${hospital.name} is confirmed.'),
+                Text(
+                    'Your appointment at ${selectedDoctor!.clinic} is confirmed'),
                 const SizedBox(height: 8),
                 Text(
                     'Doctor: ${selectedDoctor!.fullName} (${selectedDoctor!.specialty})'),
@@ -393,21 +292,15 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
             TextButton(
               child: const Text('Pay Later'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context).pop(); // Go back to hospital list
-              },
-            ),
-            ElevatedButton(
-              child: const Text('Pay Now'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.push(
+                Navigator.of(context).pop();
+                Navigator.of(
                   context,
+                ).push(
                   MaterialPageRoute(
                     builder: (context) => PaymentScreen(
                       amount: 50.00,
                       appointmentDetails: {
-                        'hospitalName': hospital.name,
+                        'hospitalName': selectedDoctor!.clinic,
                         'doctorName': selectedDoctor!.fullName,
                         'date':
                             '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
@@ -425,11 +318,118 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
     );
   }
 
+  Widget _buildDoctorsList() {
+    if (isLoadingDoctors) {
+      return Container(
+        height: 140,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (availableDoctors.isEmpty) {
+      return Container(
+        height: 140,
+        child: const Center(
+          child: Text(
+            'No doctors available',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: 140,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: availableDoctors.length,
+        itemBuilder: (context, index) {
+          final doctor = availableDoctors[index];
+          final isSelected = selectedDoctor?.doctorId == doctor.doctorId;
+
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                selectedDoctor = doctor;
+              });
+            },
+            child: Container(
+              width: 120,
+              margin: const EdgeInsets.only(right: 12.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.0),
+                border: Border.all(
+                  color: isSelected ? Colors.blue : Colors.grey[300]!,
+                  width: isSelected ? 2.0 : 1.0,
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: doctor.imageUrl != null &&
+                            doctor.imageUrl!.isNotEmpty
+                        ? (doctor.imageUrl!.startsWith('data:image')
+                            ? MemoryImage(
+                                base64Decode(
+                                  doctor.imageUrl!.split(',').last,
+                                ),
+                              )
+                            : NetworkImage(doctor.imageUrl!) as ImageProvider)
+                        : null,
+                    backgroundColor: Colors.grey[300],
+                    child: doctor.imageUrl == null || doctor.imageUrl!.isEmpty
+                        ? Icon(Icons.person, size: 30, color: Colors.grey[600])
+                        : null,
+                  ),
+                  const SizedBox(height: 8.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Text(
+                      doctor.fullName,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12.0,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(height: 4.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Text(
+                      doctor.specialty,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 10.0,
+                        color: Colors.grey[700],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Appointment' : hospital.name),
+        title: Text(_isEditing ? 'Edit Appointment' : 'Book Appointment'),
         centerTitle: true,
         elevation: 0,
       ),
@@ -437,178 +437,68 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Hospital info section (only show when creating new appointment)
-            if (!_isEditing) ...[
-              Container(
-                width: double.infinity,
-                height: 200,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(hospital.imageUrl),
-                    fit: BoxFit.cover,
-                    colorFilter: ColorFilter.mode(
-                      Colors.black.withOpacity(0.4),
-                      BlendMode.darken,
-                    ),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Text(
-                        hospital.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24.0,
+                      const Text(
+                        'Select Doctor',
+                        style: TextStyle(
+                          fontSize: 18.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 8.0),
-                      Row(
-                        children: [
-                          const Icon(Icons.location_on,
-                              color: Colors.white, size: 16.0),
-                          const SizedBox(width: 4.0),
-                          Text(
-                            hospital.location,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4.0),
-                      Row(
-                        children: [
-                          const Icon(Icons.phone,
-                              color: Colors.white, size: 16.0),
-                          const SizedBox(width: 4.0),
-                          Text(
-                            hospital.contact,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.0,
-                            ),
-                          ),
-                        ],
-                      ),
+                      const Spacer(),
+                      if (isLoadingDoctors)
+                        const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      if (!isLoadingDoctors)
+                        IconButton(
+                          onPressed: _loadDoctors,
+                          icon: const Icon(Icons.refresh),
+                          tooltip: 'Refresh doctors list',
+                        ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 8.0),
+                  _buildDoctorsList(),
+                ],
               ),
-              // Hospital description
-              Padding(
+            ),
+            if (selectedDoctor != null)
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16.0),
                 padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(color: Colors.blue[200]!),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'About',
+                      'Selected Doctor',
                       style: TextStyle(
-                        fontSize: 18.0,
                         fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
                       ),
                     ),
                     const SizedBox(height: 8.0),
-                    Text(
-                      hospital.description,
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        color: Colors.grey[700],
-                      ),
-                    ),
+                    Text('Name: ${selectedDoctor!.fullName}'),
+                    Text('Specialty: ${selectedDoctor!.specialty}'),
+                    Text('Clinic: ${selectedDoctor!.clinic}'),
+                    if (selectedDoctor!.phone.isNotEmpty)
+                      Text('Phone: ${selectedDoctor!.phone}'),
                   ],
                 ),
               ),
-            ],
-
-            // Doctors section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Select Doctor',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8.0),
-                  SizedBox(
-                    height: 140,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: hospital.doctors.length,
-                      itemBuilder: (context, index) {
-                        final doctor = hospital.doctors[index];
-                        final isSelected =
-                            selectedDoctor?.doctorId == doctor.doctorId;
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedDoctor = doctor;
-                            });
-                          },
-                          child: Container(
-                            width: 120,
-                            margin: const EdgeInsets.only(right: 12.0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12.0),
-                              border: Border.all(
-                                color: isSelected
-                                    ? Colors.blue
-                                    : Colors.grey[300]!,
-                                width: isSelected ? 2.0 : 1.0,
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CircleAvatar(
-                                  radius: 30,
-                                  backgroundImage: doctor.imageUrl != null
-                                      ? AssetImage(doctor.imageUrl!)
-                                      : const AssetImage('images'),
-                                  backgroundColor: Colors.grey[300],
-                                  onBackgroundImageError:
-                                      (exception, stackTrace) {},
-                                ),
-                                const SizedBox(height: 8.0),
-                                Text(
-                                  doctor.fullName,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                                const SizedBox(height: 4.0),
-                                Text(
-                                  doctor.specialty,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 12.0,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Booking form
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
@@ -616,9 +506,10 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _isEditing ? 'Edit Appointment' : 'Book Appointment',
-                      style: const TextStyle(
+                    const SizedBox(height: 16.0),
+                    const Text(
+                      'Patient Information',
+                      style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
                       ),
@@ -671,6 +562,14 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                         }
                         return null;
                       },
+                    ),
+                    const SizedBox(height: 16.0),
+                    const Text(
+                      'Appointment Details',
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 16.0),
                     Row(
@@ -741,7 +640,7 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: _submitForm,
+                        onPressed: selectedDoctor != null ? _submitForm : null,
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),

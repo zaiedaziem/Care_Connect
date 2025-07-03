@@ -304,4 +304,36 @@ Future<String?> _uploadImage(String userId, XFile? imageFile) async {
         return 'An error occurred: ${e.message}';
     }
   }
+
+  // Get doctors by clinic/hospital
+  Future<List<Doctor>> getDoctorsByClinic(String clinic) async {
+    try {
+      QuerySnapshot querySnapshot = await _doctorCollection
+          .where('clinic', isEqualTo: clinic)
+          .where('status', isEqualTo: 'Active')
+          .get();
+      
+      return querySnapshot.docs
+          .map((doc) => Doctor.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get doctors by clinic: ${e.toString()}');
+    }
+  }
+
+  // Get all active doctors (alternative method if you prefer this approach)
+  Future<List<Doctor>> getAllActiveDoctors() async {
+    try {
+      QuerySnapshot querySnapshot = await _doctorCollection
+          .where('status', isEqualTo: 'Active')
+          .get();
+      
+      return querySnapshot.docs
+          .map((doc) => Doctor.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get active doctors: ${e.toString()}');
+    }
+  }
+
 }
