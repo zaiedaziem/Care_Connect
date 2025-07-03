@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../services/AppointmentService.dart';
+import '../services/appointment_service.dart';
 import '../models/appointment_model.dart';
 import 'payment_screen.dart';
 import '../models/hospital.dart';
