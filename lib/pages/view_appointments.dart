@@ -87,20 +87,19 @@ class _ViewAppointmentsScreenState extends State<ViewAppointmentsScreen> {
   }
 
   void _editAppointment(Appointment appointment) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => HospitalBookingScreen(
-        appointmentToEdit: appointment,
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HospitalBookingScreen(
+          appointmentToEdit: appointment,
+        ),
       ),
-    ),
-  ).then((_) {
-    setState(() {
-      _loadAppointments();
+    ).then((_) {
+      setState(() {
+        _loadAppointments();
+      });
     });
-  });
-}
-
+  }
 
   List<Appointment> _filterAppointments(List<Appointment> appointments) {
     if (_selectedFilter == 'All') return appointments;
