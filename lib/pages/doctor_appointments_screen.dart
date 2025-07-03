@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../services/AppointmentService.dart';
+import '../services/appointment_service.dart';
 import '../models/appointment_model.dart';
 
 class DoctorAppointmentsScreen extends StatefulWidget {
