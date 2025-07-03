@@ -591,10 +591,13 @@ class _HospitalBookingScreenState extends State<HospitalBookingScreen>
       );
     }
 
+    // Option 1: Improved Horizontal Scrolling with better physics
     return SizedBox(
       height: 160,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(), // Better scroll physics
+        padding: const EdgeInsets.symmetric(horizontal: 4), // Add padding
         itemCount: availableDoctors.length,
         itemBuilder: (context, index) {
           final doctor = availableDoctors[index];

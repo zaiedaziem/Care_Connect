@@ -67,7 +67,7 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
           final data = doc.data() as Map<String, dynamic>;
           setState(() {
             userName = data['name'] ?? 'User';
-            profileImageUrl = data['profileImageUrl'];
+            profileImageUrl = data['profilePictureUrl'];
             greeting = _getGreeting();
           });
         }
@@ -194,8 +194,11 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                                 radius: 20,
                                 backgroundImage: profileImageUrl != null
                                     ? NetworkImage(profileImageUrl!)
-                                    : const AssetImage('images/profile.png')
-                                        as ImageProvider,
+                                    : null,
+                                child: profileImageUrl == null
+                                    ? const Text(
+                                        'U') // Replace 'U' with user's initial if available
+                                    : null,
                               ),
                             ),
                           ],
