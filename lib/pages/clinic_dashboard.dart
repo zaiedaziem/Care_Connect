@@ -333,22 +333,10 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                     ),
                     const SizedBox(height: 16),
                     // Second row of action buttons
+                    // ...existing code...
+// Second row of action buttons
                     Row(
                       children: [
-                        Expanded(
-                          child: _buildActionButton(
-                            icon: Icons.medical_services_outlined,
-                            label: 'Emergency\nContacts',
-                            gradient: const [
-                              Color(0xFF4ECDC4),
-                              Color(0xFF44A08D)
-                            ],
-                            onTap: () {
-                              // Add emergency contacts navigation
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 16),
                         Expanded(
                           child: _buildActionButton(
                             icon: Icons.payment,
@@ -389,32 +377,28 @@ class _ClinicDashboardState extends State<ClinicDashboard> {
                           ),
                         ),
                         const SizedBox(width: 16),
-
-                        // _buildActionButton(
-                        //   icon: Icons.location_on,
-                        //   label: 'Clinic\nLocation',
-                        //   gradient: const [
-                        //     Color(0xFF10B981),
-                        //     Color(0xFF059669)
-                        //   ],
-                        //   onTap: () {
-                        //     Navigator.push(
-                        //       context,
-                        //       MaterialPageRoute(
-                        //         builder: (context) =>
-                        //             const ClinicLocationsPage(),
-                        //       ),
-                        //     );
-                        //   },
-                        // ),
-                        // const SizedBox(width: 16),
-
-                        // Empty spacer buttons to maintain layout
-                        Expanded(child: Container()),
-                        const SizedBox(width: 18),
-                        Expanded(child: Container()),
+                        Expanded(
+                          child: _buildActionButton(
+                            icon: Icons.location_on,
+                            label: 'Clinic\nLocation',
+                            gradient: const [
+                              Color(0xFF10B981),
+                              Color(0xFF059669)
+                            ],
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ClinicLocationsPage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                       ],
                     ),
+// ...existing code...
                   ],
                 ),
               ),
